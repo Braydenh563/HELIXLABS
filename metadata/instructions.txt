@@ -1,0 +1,13 @@
+HELIXLABS - A Microbiome Simulation
+Your space research vessel has made an emergency landing on an uncharted planet. Your onboard lab has detected 26 alien base proteins. 
+
+Your mission: synthesise new life forms and observe what emerges.
+
+Type any combination of letters (A-Z) into the DNA helix bar at the bottom of the screen to create a unique species. Click inside the bordered environment to release your organisms and watch them come alive - each sequence produces a different creature with its own attributes such as colour, shape, movement, behaviour, and more.
+
+Controls:
+- Type letters - define & craft your DNA helix/sequence
+- Click environment - spawn and introduce your new species
+- Click & drag - move individual organisms
+- Randomise button - generate a surprise sequence
+- Trackpad - navigate and interact
