@@ -29,8 +29,8 @@ Note: The application & web version are only playable on a computer (PC/laptop e
 ##### INTERACT WITH THE LIVE WEB VERSION HERE
 https://editor.p5js.org/braydenh563/full/kBas-ftqq
 
-##### Click here to view the latest application installer release (v1.0.0)
-https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.0.0
+##### VIEW THE LATEST RELEASE - DISTRIBUTABLE APPLICATION v1.1.0 (Windows & Linux Compatible Download Options)
+https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0
 
 ---
 
