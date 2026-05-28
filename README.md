@@ -28,10 +28,10 @@ Controls:
 ---
 
 ##### INTERACT WITH THE LIVE WEB VERSION HERE
-https://editor.p5js.org/braydenh563/full/kBas-ftqq
+- https://editor.p5js.org/braydenh563/full/kBas-ftqq
 
 ##### VIEW THE LATEST RELEASE - DISTRIBUTABLE APPLICATION v1.1.0 (Windows & Linux Compatible Download Options)
-https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0
+- https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0
 
 ---
 
