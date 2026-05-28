@@ -25,8 +25,6 @@ Controls:
 ### Access Links
 *Note: The application & web version are only playable on a computer (PC/laptop etc). MacOS is currently not supported.*
 
----
-
 ##### INTERACT WITH THE LIVE WEB VERSION HERE
 - https://editor.p5js.org/braydenh563/full/kBas-ftqq
 
