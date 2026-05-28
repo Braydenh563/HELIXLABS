@@ -1,21 +1,72 @@
 // noprotect
 
+/*
+ * HELIXLABS - Interactive Microbiome Simulation (Dewey Cabinet)
+ *
+ * A generative simulation where users type DNA sequences into the helix text bar to
+ * synthesise unique micro-organisms. Each sequence generates a unique species,
+ * deterministically mapping a species' attributes with distinct behaviours, colours,
+ * shapes, speeds, trails, and glow properties. Users can spawn, observe, manage, and
+ * interact with multiple species simultaneously inside a virtual environment via
+ * elements which feature a futuristic Jarvis inspired glassmorphism UI aesthetic.
+ *
+ * Name: Brayden Hoyle | Student Number: n11967340
+ *
+ * Various code sections were adapted from the following sources:
+ * - Craig Reynolds' Boids algorithm (flock behaviour):
+ *   https://www.red3d.com/cwr/boids/
+ * - Daniel Shiffman's separation steering from Nature of Code (scatter behaviour):
+ *   https://natureofcode.com/autonomous-agents/
+ * - Jared Donovan's Creative Coding Meandering demo (drift wander behaviour):
+ *   https://editor.p5js.org/creativecoding/sketches/m1PcSxkOe
+ * - Jared Donovan's Creative Coding Grow demo (growth behaviour):
+ *   https://editor.p5js.org/creativecoding/sketches/1yVKKYiAX
+ * - Claude Cafe's Colourful Orbits algorithm (orbit behaviour):
+ *   https://claudes.cafe/sketches/colorful-orbits/
+ * - Claude Cafe's Lissajous Curves algorithm (lissajous behaviour):
+ *   https://claudes.cafe/sketches/lissajous-curves/
+ * - Claude Cafe's Ripple Effect algorithm (pulse ripple behaviour):
+ *   https://claudes.cafe/sketches/ripple-effect/
+ * - p5.js Soft Body Maths & Physics example (colony behaviour):
+ *   https://p5js.org/examples/math-and-physics-soft-body/
+ *
+ * Each algorithm was significantly modified with each being integrated
+ * into a DNA seed-driven property/attribute system. These behaviours were
+ * extended with new steering logic, state machines, and visual trail/glow
+ * mechanics.
+ */
+
 // ---
 // Global Variables
 // ---
 
+// Base canvas widths - if larger resolution, canvas will resize to window while retaining the aspect ratio
 const canvasWidth = 1280;
 const canvasHeight = 720;
-let mainCanvas;
 
+let mainCanvas;
 let myFont;
 
+// Controls pixel density to control render quality vs performance
 let drawPixelDensity = 1.5; // 1, 1.5, 2, 3 - Default: 4
+
+// Caches/stores the generated and blurred terrain as a graphics object to reduce lag, also partially used as the frosted glass layer for some UI elements
 let blurredTerrainGraphic; // Store/cache blurred background for UI
+
+// Ambience
+let ambienceSounds = []; // Preloaded sound/music files
+let ambienceManager; // BackgroundAmbienceManager class instance
+
+// Mute button
+let muteUnmuteBtnRadius = 16;
+let muteUnmuteBtnX = 0;
+let muteUnmuteBtnY = 0;
+
+// Tracks the rendered text height of the generated species description to adjust the scroll height/distance accordingly
 let descTotalTextHeight = 0; // Store/cache the description text height
 
-// App State
-let programState = "start"; // start, introduction/tutorial, simulation
+// App State - Which screen is currently active
+let programState = "start"; // start, intro, simulation
 
 // Start Page
 let startTitleText = "HELIXLABS"; // BIOLABS, HELIXLABS, ASTROGEN, GENLAB, GENESIS LABS, BIOWEAVE, SPIRAL FOUNDARY
@@ -23,9 +74,8 @@ let beginBtnW = 215;
 let beginBtnH = 58;
 
 let textInput;
-let btnGenerate;
-let btnRandomise;
 
+// Initialise virtual environment borders
 let envX = 0;
 let envY = 0;
 let envW = 0;
@@ -33,7 +83,10 @@ let envH = 0;
 
 let spatialGrid = {};
 
+// All active node instances are stored here
 let nodes = [];
+
+// Highest allowed number of nodes able to be spawned even if the dynamically calculated species cap is higher
 let maxNodeCap = 70; // 90, 120
 let savedNodeTypes = [];
 
@@ -54,18 +107,18 @@ let tooltipDrawX = 0;
 let tooltipDrawY = 0;
 
 // Tutorial
-let tutorialState = 0; // 0 - not started, 1-5 - steps, -1 - done
+let tutorialState = 0; // 0 = not started, 1-3 = tutorialSteps, -1 = done
 let introPage = 0; // Current intro slide (0-based index)
-let contextualHintsShown = {}; // tracks which hints have fired
-// Keys: "speciesIndex", "activeList", "energyMonitor", "controls"
+let contextualHintsShown = {}; // tracks which hints have been shown
+// Keys - "speciesIndex", "activeList", "energyMonitor", "controls"
 let activeContextualHint = "";
 let contextualHintTimer = 0;
 let tutorialSpawnCount = 0;
 let postTutorialPromptTimer = 0;
 
 // GIFs
-let tutorialGifs = {}; // { stepNumber: p5.Image }
-let hintGifs = {}; // { hintKey: p5.Image }
+let tutorialGifs = {};
+let hintGifs = {};
 
 // Hover state tracking per hint key
 let hintHoverFrames = {}; // Frames mouse has been over the feature
@@ -120,15 +173,16 @@ let btnStartX;
 
 let isDarkMode = true;
 
-let btnClearNodes;
-let btnToggleSpawnInteract;
-
 // let isSpawnMode = true;
 let isPaused = false;
 
 let draggedNode = null;
 let dragOffsetX = 0;
 let dragOffsetY = 0;
+
+let exitBtnRadius = 20;
+let exitBtnX;
+let exitBtnY;
 
 let tutorialBtnX = 0;
 let tutorialBtnY = 0;
@@ -143,7 +197,6 @@ let btnTogglePlayPauseX;
 let btnTogglePlayPauseY;
 let btnTogglePlayPauseRadius;
 
-// let isSpawnMode = true;
 let pulse = 0;
 
 let fpsX = 0;
@@ -157,17 +210,16 @@ let fpsPanelHCollapsed = 22;
 let fpsHistory = [];
 let fpsHistoryLength = 30;
 
-let terrainNoiseOffset = 0;
 let terrainColourSeed = 0;
 let terrainGraphic;
 let terrainScale; // 4, 6, 7, 8
 
-let colonyGroups = {}; // ColonyID - { anchorX, anchorY, noiseOffsetX, noiseOffsetY, colonyRotationSpeed, shapePattern }
-let colonyGroupCounter = 0; // unique ID counter for new colonies
+let colonyGroups = {}; // Stores and tracks each colony's anchor positions, rotation speed, noise offsets, and shape pattern
+let colonyGroupCounter = 0; // unique ID counter for new colonies (auto-increments)
 let colonyMaxSize = 8; // max nodes per colony group
 
-let currentDNA;
-let sumCode;
+let currentDNA; // Current dna seed
+let sumCode; // The driving dna seed value
 
 let manageNotifications = [];
 let weaveBehaviourWarningShown = false;
@@ -182,9 +234,6 @@ let sidebarInnerX = 0;
 let sidebarContentW = 0;
 let sidebarRightEdge = 0;
 let sidebarH = 720 - sidebarMargin * 2;
-let sidebarMode = "select"; // select, extract individual, extract all, discard dna
-let sidebarModeBarY = 0;
-let sidebarModeBarH = 26;
 let openKebabIndex = -1; // Which node type row the kebab is open, -1 - none
 
 let pageSelectorY = 0;
@@ -336,6 +385,7 @@ let complementMap = {
   N: "M",
 };
 
+// Map each DNA protein letter and helix rung to its RGB display colour in the DNA helix field
 let proteinColourMap = {
   A: [255, 100, 80],
   B: [255, 145, 50],
@@ -378,44 +428,44 @@ let velocityBehaviours = [
 
 let behaviourPhrases = {
   bounce: [
-    "ricochets energetically between environmental boundaries",
+    "linearly ricochets energetically between environmental boundaries",
     "exhibits high-velocity elastic locomotion along hard surfaces",
-    "caroms off the edges of its habitat with explosive rebound energy",
+    "rebounds off the edges of its habitat with explosive rebound energy",
   ],
   "contrail orb": [
     "traces luminous spiralling contrails through the medium",
-    "leaves bioluminescent residue behind as it spirals and drifts",
+    "leaves semi-translucent bioluminescent residue behind as it spirals and drifts",
     "curves through the environment, shedding a glowing wake",
   ],
   flock: [
-    "coordinates in graceful murmuration-like group formations",
-    "demonstrates sophisticated emergent schooling behaviour",
-    "self-organises into fluid, shape-shifting collective patterns",
+    "coordinates in graceful bird flock-like group formations",
+    "demonstrates consistent schooling behaviour",
+    "self-organises into fluid, shifting collective patterns",
   ],
   scatter: [
-    "largely sedentary, making rare spontaneous hops between resting positions, but erupts into violent evasion at the approach of any other organism",
+    "largely sedentary, making rare spontaneous hops between resting positions, but violent evades any other approaching organism",
     "highly territorial - sits anchored between infrequent positional bursts, scattering explosively when any nearby organism encroaches on its space",
     "exhibits punctuated stillness and mostly stationary, but often prone to sudden bursts of movement, with extreme defensive avoidance of all other species",
   ],
   orbit: [
-    "locks into persistent elliptical orbits around other organisms",
-    "gravitates endlessly around foreign species in tight arcs",
+    "locks into persistent elliptical orbits around mass bodies of organisms",
+    "gravitates endlessly around foreign species in varying circular arcs",
     "maintains circular patrol routes centred on nearby life-forms",
   ],
   lissajous: [
-    "traces precise mathematical figure-eight trajectories",
-    "follows complex Lissajous curves with mechanical precision",
+    "traces precise mathematical trajectories similar to that of a figure-eight",
+    "follows complex Lissajous curves with unnerving precision for unknown means",
     "etches elegant parametric paths through the environment",
   ],
   "drift wander": [
     "drifts lazily on invisible environmental microcurrents",
-    "meanders with slow Brownian motion across the terrain",
+    "meanders with slow smooth motion across the terrain",
     "wanders aimlessly, guided by unseen atmospheric flows",
   ],
   colony: [
-    "clusters into tightly-bound rotating colonial formations around drift-anchors",
-    "maintains rigid orbital proximity within multi-member superorganism assemblies",
-    "forms stationary colonial formations resembling microscopic star clusters",
+    "clusters into tightly-bound rotating and drifting colonial formations",
+    "maintains rigid orbital proximity within grouped superorganism clusters",
+    "forms mostly stationary colonial formations resembling microscopic star clusters",
   ],
   "pulse ripple": [
     "emits rhythmic concentric pressure wave rings outward",
@@ -423,9 +473,9 @@ let behaviourPhrases = {
     "broadcasts regular shockwave rings from its centre mass",
   ],
   growth: [
-    "drifts purposefully toward Perlin-field waypoints, actively repelling its own kind",
-    "navigates via noise-driven guidance across the terrain, maintaining spacing from siblings",
-    "explores with slow deliberate motion toward algorithmically-determined targets",
+    "drifts purposefully toward unseen spacial waypoints, actively repelling its own kind",
+    "continuously endeavours to seek unseen spacial waypoints across the terrain, maintaining relative distance from its siblings",
+    "explores with slow deliberate motion toward unseen spacial waypoints",
   ],
   weave: [
     "weaves persistent tapestries of bioluminescent thread across the terrain",
@@ -433,9 +483,9 @@ let behaviourPhrases = {
     "stitches luminous patterns into the environment as it meanders",
   ],
   predate: [
-    "drifts patiently until prey is detected, then accelerates into a relentless chase - consuming or converting whatever it catches",
-    "an apex predator that locks onto nearby organisms and pursues them across the environment until it succeeds or abandons the hunt",
-    "actively hunts and consumes other species, occasionally converting captured prey into new hunters of its own kind",
+    "drifts patiently until prey enters its personal territory, then chase and attept to consume its prey if successfully caught. It has been noted that some prey have been able to escape its clutches",
+    "an apex predator that despises nearby organisms encroaching apon its territory, and  pursue them across the environment until it succeeds or abandons the hunt",
+    "actively hunts and consumes other species should they not respect its personal space, occasionally converting captured prey into new hunters of its own kind",
   ],
 };
 
@@ -460,7 +510,7 @@ let trailTypes = {
   ribbon: "wide luminescent ribbon",
 };
 
-// Energy consumption ratings per behaviour
+// Energy consumption ratings per behaviour to reduce lag and dynamically cap node spawn amounts
 let behaviourEnergyRatings = {
   weave: 18, // 10, 12, 15, 22
   flock: 5, // 4
@@ -493,6 +543,7 @@ let firstNames = [
   "Vibraticus",
   "Orbitans",
 ];
+
 let lastNames = [
   "Indecisus",
   "Mediocris",
@@ -553,7 +604,7 @@ let introSlideData = [
   },
 ];
 
-// Tutorial step data: [label, body text, target area (x,y,w,h), arrow direction]
+// Tutorial step data - label, body text, target area (x, y, w, h), arrow direction
 let tutorialSteps = [
   {
     label: "THE DNA SEQUENCE",
@@ -631,6 +682,7 @@ let dnaColours = [
   "#A1887F",
   "#7986CB",
   "#AED581",
+  "#848B79",
   "#FF8A65",
   "#BA68C8",
   "#4FC3F7",
@@ -647,9 +699,9 @@ let colourNames = {
   "#F1C40F": "Sunflower",
   "#9B59B6": "Violet",
   "#E67E22": "Tangerine",
-  "#1ABC9C": "Teal",
+  "#1ABC9C": "Light Sea Green",
   "#E91E63": "Rose",
-  "#00BCD4": "Cyan",
+  "#00BCD4": "Cerulean",
   "#FF5722": "Ember",
   "#8BC34A": "Lime",
   "#FF9800": "Amber",
@@ -657,13 +709,14 @@ let colourNames = {
   "#009688": "Seafoam",
   "#EA80FC": "Orchid",
   "#F06292": "Blush",
-  "#4DB6AC": "Mint",
+  "#4DB6AC": "Verdigris",
   "#FFD54F": "Honey",
   "#A1887F": "Clay",
   "#7986CB": "Periwinkle",
   "#AED581": "Sage",
-  "#FF8A65": "Peach",
-  "#BA68C8": "Lavender",
+  "#848B79": "Feijoa",
+  "#FF8A65": "Coral",
+  "#BA68C8": "Amethyst",
   "#4FC3F7": "Ice Blue",
   "#DCE775": "Chartreuse",
   "#FFF176": "Lemon",
@@ -707,6 +760,7 @@ let connectionStylesArray = ["same-type", "all", "none"];
 function preload() {
   myFont = loadFont("fonts/Montserrat-VariableFont_wght.ttf");
   loadGifs();
+  loadAmbienceSounds();
 }
 
 function setup() {
@@ -780,6 +834,7 @@ function setup() {
         if (editPopupActiveField === "DNA") {
           editPopupDNAText = editPopupDNAText.slice(0, -1);
         }
+
         if (editPopupActiveField === "NAME") {
           editPopupNameText = editPopupNameText.slice(0, -1);
         }
@@ -787,13 +842,13 @@ function setup() {
       }
     }
 
-    if (event.key === "Escape") {
-      if (isEditPopupOpen) {
-        isEditPopupOpen = false;
-        editPopupActiveField = "";
-      }
-      openKebabIndex = -1;
-    }
+    // if (event.key === "Escape") {
+    //   if (isEditPopupOpen) {
+    //     isEditPopupOpen = false;
+    //     editPopupActiveField = "";
+    //   }
+    //   openKebabIndex = -1;
+    // }
 
     if (event.key === "Enter" && isEditPopupOpen) {
       confirmEditPopup();
@@ -801,28 +856,37 @@ function setup() {
   });
 
   manageNotifications = new ManageNotifications();
+
+  // Initialise ambience manager and then register each sound file in the corresponding arrays within the manager class
+  ambienceManager = new BackgroundAmbienceManager();
+  for (let sound of ambienceSounds) {
+    ambienceManager.addTrack(sound);
+  }
+
   updateTerrain();
 }
 
+/* Scales the canvas to fill the browser window while preserving the preset aspect ratio, and also centers the canvas horizontally and vertically within the window
+ */
 function snapCanvasToWindow() {
-    // Calculate scale amount while retaining aspect ratio
-    let scaleFactor = min(windowWidth / canvasWidth, windowHeight / canvasHeight);
-    let cssWidth = floor(canvasWidth * scaleFactor);
-    let cssHeight = floor(canvasHeight * scaleFactor);
+  // Calculate scale amount while retaining aspect ratio
+  let scaleFactor = min(windowWidth / canvasWidth, windowHeight / canvasHeight);
+  let cssWidth = floor(canvasWidth * scaleFactor);
+  let cssHeight = floor(canvasHeight * scaleFactor);
 
-    // Resize canvas
-    mainCanvas.elt.style.width  = cssWidth + "px";
-    mainCanvas.elt.style.height = cssHeight + "px";
+  // Resize canvas
+  mainCanvas.elt.style.width = cssWidth + "px";
+  mainCanvas.elt.style.height = cssHeight + "px";
 
-    // Centre canvas in window
-    mainCanvas.elt.style.position = "absolute";
-    mainCanvas.elt.style.left = floor((windowWidth  - cssWidth) / 2) + "px";
-    mainCanvas.elt.style.top  = floor((windowHeight - cssHeight) / 2) + "px";
+  // Centre canvas in window
+  mainCanvas.elt.style.position = "absolute";
+  mainCanvas.elt.style.left = floor((windowWidth - cssWidth) / 2) + "px";
+  mainCanvas.elt.style.top = floor((windowHeight - cssHeight) / 2) + "px";
 }
 
 // Automatically called when window is resized
 function windowResized() {
-    fitCanvasToWindow();
+  snapCanvasToWindow();
 }
 
 // Could have some node variants create obstacles on the canvas
@@ -955,21 +1019,6 @@ function draw() {
     spatialGrid[key].push(node);
   }
 
-  //   for (let i = 0; i < nodes.length; i++) {
-  //     let node = nodes[i];
-  //     node.id = i;
-  //     node.centerX = floor(node.x / cellSize);
-  //     node.centerY = floor(node.y / cellSize);
-  //     let key = node.centerX * 10000 + node.centerY;
-  //     // let key = node.centerX + "," + node.centerY;
-
-  //     if (!spatialGrid[key]) {
-  //       spatialGrid[key] = [];
-  //     }
-
-  //     spatialGrid[key].push(node);
-  //   }
-
   let scaleFactor = map(nodes.length, 20, maxNodeCap, 1.0, 0.4);
   scaleFactor = constrain(scaleFactor, 0.4, 1.0);
 
@@ -1083,10 +1132,81 @@ function draw() {
     // Draw FPS Indicator
     drawFPSIndicator();
 
-    // Play/Pause button
+    exitBtnRadius = 20;
+    exitBtnX = width - 50;
+    exitBtnY = exitBtnRadius + 30;
+
+    btnTogglePlayPauseRadius = 20;
+    btnTogglePlayPauseX =
+      exitBtnX - exitBtnRadius - btnTogglePlayPauseRadius - 10;
+    btnTogglePlayPauseY = exitBtnY;
+
+    tutorialBtnRadius = 16;
+    tutorialBtnX =
+      btnTogglePlayPauseX - btnTogglePlayPauseRadius - tutorialBtnRadius - 10;
+    tutorialBtnY = btnTogglePlayPauseY;
+
+    muteUnmuteBtnRadius = 16;
+    muteUnmuteBtnX = envX + envW - muteUnmuteBtnRadius - 14;
+    muteUnmuteBtnY = envY + envH - muteUnmuteBtnRadius - 14;
+
+    let exitBtnIsHovered =
+      dist(mouseX, mouseY, exitBtnX, exitBtnY) < exitBtnRadius;
+
+    if (exitBtnIsHovered) {
+      registerTooltip(
+        "exitBtn",
+        "Return to Start Menu",
+        exitBtnX,
+        exitBtnY + exitBtnRadius + 35
+      );
+    }
+
+    push();
+
+    // Frosted Glass circle
+    drawingContext.save();
+    drawingContext.beginPath();
+    drawingContext.clip();
+    image(blurredTerrainGraphic, 0, 0);
+
+    noStroke();
+    // Tint red on mouse hover
+    fill(exitBtnIsHovered ? [255, 80, 80, 65] : [0, 130, 210, 48]);
+    circle(exitBtnX, exitBtnY, exitBtnRadius * 2);
+    drawingContext.restore();
+
+    noStroke();
+    fill(exitBtnIsHovered ? [200, 50, 50, 55] : [0, 80, 160, 44]);
+    circle(exitBtnX, exitBtnY, exitBtnRadius * 2);
+
+    noFill();
+    stroke(exitBtnIsHovered ? [255, 100, 100, 120] : [0, 200, 255, 55]);
+    strokeWeight(1.5);
+    circle(exitBtnX, exitBtnY, exitBtnRadius * 2);
+
+    noStroke();
+    fill(exitBtnIsHovered ? [255, 200, 200, 255] : [130, 210, 255, 300]);
+    textSize(11);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    text("➜]", exitBtnX, exitBtnY);
+    // text("➜]", exitBtnX + 1, exitBtnY - 1);
+
+    pop();
+
+    // Play/Pause Button
     let playPauseIsHovered =
       dist(mouseX, mouseY, btnTogglePlayPauseX, btnTogglePlayPauseY) <
       btnTogglePlayPauseRadius;
+    if (playPauseIsHovered) {
+      registerTooltip(
+        "playPauseBtn",
+        "Restart tutorial",
+        btnTogglePlayPauseX,
+        btnTogglePlayPauseY + btnTogglePlayPauseRadius + 35
+      );
+    }
 
     drawGlassCircleBtn(
       btnTogglePlayPauseX,
@@ -1096,19 +1216,15 @@ function draw() {
       isPaused ? "▶" : "❚❚"
     );
 
-    tutorialBtnRadius = 16;
-    tutorialBtnX =
-      btnTogglePlayPauseX - btnTogglePlayPauseRadius - tutorialBtnRadius - 10;
-    tutorialBtnY = btnTogglePlayPauseY;
-
+    // Restart Tutorial Button
     tutorialBtnIsHovered =
       dist(mouseX, mouseY, tutorialBtnX, tutorialBtnY) < tutorialBtnRadius;
     if (tutorialBtnIsHovered) {
       registerTooltip(
         "tutorialBtn",
-        "Replay tutorial walkthrough",
+        "Restart tutorial",
         tutorialBtnX,
-        tutorialBtnY + tutorialBtnRadius + 8
+        tutorialBtnY + tutorialBtnRadius + 35
       );
     }
 
@@ -1118,6 +1234,32 @@ function draw() {
       tutorialBtnRadius,
       tutorialBtnIsHovered,
       "?"
+    );
+
+    // Mute/Unmute Button
+    muteUnmuteBtnRadius = 16;
+    muteUnmuteBtnX =
+      tutorialBtnX - tutorialBtnRadius - muteUnmuteBtnRadius - 10;
+    muteUnmuteBtnY = tutorialBtnY;
+
+    let muteUnmuteBtnIsHovered =
+      dist(mouseX, mouseY, muteUnmuteBtnX, muteUnmuteBtnY) <
+      muteUnmuteBtnRadius;
+    if (muteUnmuteBtnIsHovered) {
+      registerTooltip(
+        "muteUnmuteBtn",
+        ambienceManager.isMuted ? "Unmute ambience" : "Mute ambience",
+        muteUnmuteBtnX,
+        muteUnmuteBtnY + muteUnmuteBtnRadius + 35
+      );
+    }
+
+    drawGlassCircleBtn(
+      muteUnmuteBtnX,
+      muteUnmuteBtnY,
+      muteUnmuteBtnRadius,
+      muteUnmuteBtnIsHovered,
+      ambienceManager.isMuted ? "🔇" : "🔊"
     );
 
     if (isEditPopupOpen) {
@@ -1135,6 +1277,8 @@ function draw() {
 
     checkContextualHintHovers();
     drawContextualHintPanels();
+
+    ambienceManager.update();
 
     // Show & manage notifications
     manageNotifications.update();
@@ -1566,12 +1710,16 @@ function handleIntroClick() {
       envY = sidebarMargin;
       envW = width - envX - sidebarMargin;
       envH = height - sidebarMargin * 2 - bottomBarH - sidebarMargin;
+
       if (savedNodeTypes.length === 0) {
         createInitialNodes();
       }
+
+      ambienceManager.start();
     } else {
       introPage++;
     }
+
     return;
   }
 
@@ -3538,7 +3686,7 @@ function drawContextualHintPanels() {
         gifY = boxY - gifH - 8;
       }
 
-      // Clipped rounded container
+      // Clipped and rounded environment container
       drawingContext.save();
       drawingContext.beginPath();
       roundRectanglePath(drawingContext, gifX, gifY, gifW, gifH, 8);
@@ -3901,7 +4049,7 @@ function drawEditPopup() {
 
 function drawSecretCornerTab() {
   let panelW = 140;
-  let panelH = 110; // 80, 90, 120
+  let panelH = 80; // 80, 90, 110, 120
   let panelX = width - panelW - 5;
   let panelY = 6;
 
@@ -3983,69 +4131,75 @@ function drawSecretCornerTab() {
     pillY + pillH / 2
   );
 
-  let returnToStartBtnX = panelX + 8;
-  let returnToStartBtnY = pillY + pillH + 8;
-  let returnToStartBtnW = panelW - 16;
-  let returnToStartBtnH = 26;
-  let returnToStartBtnHov =
-    mouseX > returnToStartBtnX &&
-    mouseX < returnToStartBtnX + returnToStartBtnW &&
-    mouseY > returnToStartBtnY &&
-    mouseY < returnToStartBtnY + returnToStartBtnH;
+  //   let returnToStartBtnX = panelX + 8;
+  //   let returnToStartBtnY = pillY + pillH + 8;
+  //   let returnToStartBtnW = panelW - 16;
+  //   let returnToStartBtnH = 26;
+  //   let returnToStartBtnHov =
+  //     mouseX > returnToStartBtnX &&
+  //     mouseX < returnToStartBtnX + returnToStartBtnW &&
+  //     mouseY > returnToStartBtnY &&
+  //     mouseY < returnToStartBtnY + returnToStartBtnH;
 
-  // Frost blur
-  drawingContext.filter = "blur(4px)";
-  noStroke();
-  fill(returnToStartBtnHov ? [180, 60, 60, 50] : [0, 120, 200, 28]);
-  rect(
-    returnToStartBtnX,
-    returnToStartBtnY,
-    returnToStartBtnW,
-    returnToStartBtnH,
-    13
-  );
-  drawingContext.filter = "none";
+  //   // Frost blur
+  //   drawingContext.filter = "blur(4px)";
+  //   noStroke();
+  //   fill(returnToStartBtnHov ? [180, 60, 60, 50] : [0, 120, 200, 28]);
+  //   rect(
+  //     returnToStartBtnX,
+  //     returnToStartBtnY,
+  //     returnToStartBtnW,
+  //     returnToStartBtnH,
+  //     13
+  //   );
+  //   drawingContext.filter = "none";
 
-  // Glass fill
-  noStroke();
-  fill(returnToStartBtnHov ? [140, 40, 40, 38] : [0, 80, 160, 18]);
-  rect(
-    returnToStartBtnX,
-    returnToStartBtnY,
-    returnToStartBtnW,
-    returnToStartBtnH,
-    13
-  );
+  //   // Glass fill
+  //   noStroke();
+  //   fill(returnToStartBtnHov ? [140, 40, 40, 38] : [0, 80, 160, 18]);
+  //   rect(
+  //     returnToStartBtnX,
+  //     returnToStartBtnY,
+  //     returnToStartBtnW,
+  //     returnToStartBtnH,
+  //     13
+  //   );
 
-  // Border
-  noFill();
-  stroke(returnToStartBtnHov ? [255, 120, 120, 130] : [0, 200, 255, 55]);
-  strokeWeight(1);
-  rect(
-    returnToStartBtnX,
-    returnToStartBtnY,
-    returnToStartBtnW,
-    returnToStartBtnH,
-    13
-  );
+  //   // Border
+  //   noFill();
+  //   stroke(returnToStartBtnHov ? [255, 120, 120, 130] : [0, 200, 255, 55]);
+  //   strokeWeight(1);
+  //   rect(
+  //     returnToStartBtnX,
+  //     returnToStartBtnY,
+  //     returnToStartBtnW,
+  //     returnToStartBtnH,
+  //     13
+  //   );
 
-  // Label
-  noStroke();
-  fill(returnToStartBtnHov ? [255, 200, 200, 240] : [160, 210, 255, 190]);
-  textSize(9);
-  textStyle(BOLD);
-  textAlign(CENTER, CENTER);
-  text(
-    "↩ Start Menu",
-    returnToStartBtnX + returnToStartBtnW / 2,
-    returnToStartBtnY + returnToStartBtnH / 2
-  );
+  //   // Label
+  //   noStroke();
+  //   fill(returnToStartBtnHov ? [255, 200, 200, 240] : [160, 210, 255, 190]);
+  //   textSize(9);
+  //   textStyle(BOLD);
+  //   textAlign(CENTER, CENTER);
+  //   text(
+  //     "↩ Start Menu",
+  //     returnToStartBtnX + returnToStartBtnW / 2,
+  //     returnToStartBtnY + returnToStartBtnH / 2
+  //   );
 
   // Export PNG button
   let exportBtnX = panelX + 8;
-  let exportBtnY = returnToStartBtnY + returnToStartBtnH + 8;
+  let exportBtnY = pillY + pillH + 8;
   let exportBtnW = panelW - 16;
   let exportBtnH = 26;
+
+  // let exportBtnX = panelX + 8;
+  // let exportBtnY = returnToStartBtnY + returnToStartBtnH + 8;
+  // let exportBtnW = panelW - 16;
+  // let exportBtnH = 26;
+
   let exportBtnHov =
     mouseX > exportBtnX &&
     mouseX < exportBtnX + exportBtnW &&
@@ -4314,22 +4468,6 @@ function mousePressed() {
     return;
   }
 
-  // Tutorial '?' button click
-  if (
-    !secretTabHovered &&
-    dist(mouseX, mouseY, tutorialBtnX, tutorialBtnY) < tutorialBtnRadius
-  ) {
-    if (tutorialState > 0) {
-      setTutorialState(-1);
-    } else {
-      setTutorialState(1);
-      resetContextualHints();
-      openKebabIndex = -1;
-      showNotification("Tutorial started", "info");
-    }
-    return;
-  }
-
   if (isEditPopupOpen) {
     let editPanelWidth = 340;
     let editPanelHeight = 180;
@@ -4423,39 +4561,44 @@ function mousePressed() {
       return;
     }
 
-    let returnBtnX = panelX + 8;
-    let returnBtnY = pillY + pillH + 8;
-    let returnBtnW = panelW - 16;
-    let returnBtnH = 26;
+    //     let returnBtnX = panelX + 8;
+    //     let returnBtnY = pillY + pillH + 8;
+    //     let returnBtnW = panelW - 16;
+    //     let returnBtnH = 26;
 
-    if (
-      mouseX > returnBtnX &&
-      mouseX < returnBtnX + returnBtnW &&
-      mouseY > returnBtnY &&
-      mouseY < returnBtnY + returnBtnH
-    ) {
-      programState = "start";
-      nodes = [];
-      colonyGroups = {};
-      colonyGroupCounter = 0;
-      savedNodeTypes = [];
-      sidebarWidth = sidebarFullWidth;
-      isSidebarCollapsed = false;
-      speciesIndexPage = 0;
-      descScrollY = 0;
-      dnaListScrollOffset = 0;
-      isEditPopupOpen = false;
-      openKebabIndex = -1;
-      isPaused = false;
-      randomiseDNA();
-      return;
-    }
+    //     if (
+    //       mouseX > returnBtnX &&
+    //       mouseX < returnBtnX + returnBtnW &&
+    //       mouseY > returnBtnY &&
+    //       mouseY < returnBtnY + returnBtnH
+    //     ) {
+    //       programState = "start";
+    //       nodes = [];
+    //       colonyGroups = {};
+    //       colonyGroupCounter = 0;
+    //       savedNodeTypes = [];
+    //       sidebarWidth = sidebarFullWidth;
+    //       isSidebarCollapsed = false;
+    //       speciesIndexPage = 0;
+    //       descScrollY = 0;
+    //       dnaListScrollOffset = 0;
+    //       isEditPopupOpen = false;
+    //       openKebabIndex = -1;
+    //       isPaused = false;
+    //       randomiseDNA();
+    //       return;
+    //     }
 
     // Export PNG button click
     let exportBtnX = panelX + 8;
-    let exportBtnY = returnBtnY + returnBtnH + 8;
+    let exportBtnY = pillY + pillH + 8;
     let exportBtnW = panelW - 16;
     let exportBtnH = 26;
+
+    // let exportBtnX = panelX + 8;
+    // let exportBtnY = returnBtnY + returnBtnH + 8;
+    // let exportBtnW = panelW - 16;
+    // let exportBtnH = 26;
 
     if (
       mouseX > exportBtnX &&
@@ -4550,13 +4693,6 @@ function mousePressed() {
     }
   }
 
-  // dnaFieldY = barY + 7; // 6
-  // dnaFieldHeight = bottomBarH - 14;
-  // innerY = barY + bottomBarH / 2;
-  // totalBtnWidths = btnWidth * 2 + btnGap * 2 - 28;
-  // // totalBtnWidths = btnWidth * 3 + btnGap * 3;
-  // dnaFieldWidth = barWidth - dnaLabelWidth - totalBtnWidths - fieldPad * 6 - 10;
-
   readUserInput();
 
   // FPS panel toggle click
@@ -4644,12 +4780,42 @@ function mousePressed() {
       return;
     }
     dnaInputText = "";
-    bottomBarActiveField = "DNA"; // keep the field focused
+    bottomBarActiveField = "DNA"; // Keep the field focused
     return;
   }
 
   if (mouseY < barY) {
     bottomBarActiveField = "";
+  }
+
+  // Exit to Start Menu button
+  exitBtnRadius = 20;
+  exitBtnX = width - 50;
+  exitBtnY = exitBtnRadius + 30;
+
+  if (
+    !secretTabHovered &&
+    dist(mouseX, mouseY, exitBtnX, exitBtnY) < exitBtnRadius
+  ) {
+    if (tutorialState > 0) {
+      return;
+    }
+
+    programState = "start";
+    nodes = [];
+    colonyGroups = {};
+    colonyGroupCounter = 0;
+    savedNodeTypes = [];
+    sidebarWidth = sidebarFullWidth;
+    isSidebarCollapsed = false;
+    speciesIndexPage = 0;
+    descScrollY = 0;
+    dnaListScrollOffset = 0;
+    isEditPopupOpen = false;
+    openKebabIndex = -1;
+    isPaused = false;
+    randomiseDNA();
+    return;
   }
 
   // Play/Pause button
@@ -4668,6 +4834,35 @@ function mousePressed() {
     } else {
       showNotification("Resumed", "info");
     }
+    return;
+  }
+
+  // Tutorial '?' button click
+  if (
+    !secretTabHovered &&
+    dist(mouseX, mouseY, tutorialBtnX, tutorialBtnY) < tutorialBtnRadius
+  ) {
+    if (tutorialState > 0) {
+      setTutorialState(-1);
+    } else {
+      setTutorialState(1);
+      resetContextualHints();
+      openKebabIndex = -1;
+      showNotification("Tutorial started", "info");
+    }
+    return;
+  }
+
+  // Mute/Unmute ambience button
+  if (
+    !secretTabHovered &&
+    dist(mouseX, mouseY, muteUnmuteBtnX, muteUnmuteBtnY) < muteUnmuteBtnRadius
+  ) {
+    ambienceManager.toggleMute();
+    showNotification(
+      ambienceManager.isMuted ? "Sound Muted" : "Ambience Unmuted",
+      "info"
+    );
     return;
   }
 
@@ -5157,6 +5352,7 @@ function keyPressed() {
       createInitialNodes();
     }
 
+    ambienceManager.start();
     return false;
   }
 
@@ -5218,7 +5414,9 @@ function keyTyped() {
   }
 
   if (bottomBarActiveField == "DNA") {
-    if (key == "BACKSPACE" || key == "ENTER" || key == "ESCAPE") {
+    // if (key == "BACKSPACE" || key == "ENTER" || key == "ESCAPE") {
+    if (key == "BACKSPACE" || key == "ENTER") {
+      // Can't use escape key for dewey cabinet
       return;
     }
 
@@ -5249,6 +5447,8 @@ function keyTyped() {
 // Node DNA & Species Logic
 // ---
 
+/* Generates a deterministic DNA profile object from the currently entered DNA input string/seed. Each property (behaviour, colour, shape, speed, size, etc.) is derived from the total sum of the character codes in the string via the 'map' function (the index of the DNA characters matters), so the same sequence always produces the same species. The function returns a profile object containing all node type properties.
+ */
 function generateDNAProfile(inputString) {
   let sumCode = 0;
 
@@ -5314,6 +5514,8 @@ function generateDNAProfile(inputString) {
   };
 }
 
+/* Generates a species name by combining entry indexes from the firstNames and lastNames arrays, these are deterministically selected using the sumCode seed. This function returns the name as a "firstName lastName" string.
+ */
 function generateSpeciesName(sumCode) {
   let firstName = firstNames[sumCode % firstNames.length];
   let lastName = lastNames[(sumCode * 7) % lastNames.length];
@@ -5321,6 +5523,8 @@ function generateSpeciesName(sumCode) {
   return firstName + " " + lastName;
 }
 
+/* Builds an easily human-readable description of for each species based off its DNA profile. The phrasing is selected from pre-defined arrays using the seed value so the description is consistent for a given species. This function returns the description as a formatted multi-line string.
+ */
 function generateSpeciesDescription(dna) {
   let seed = dna.dnaCharSeedValue;
   let pick = (array, offset) =>
@@ -5399,6 +5603,8 @@ function generateSpeciesDescription(dna) {
   );
 }
 
+/* Sets the active species in the sidebar to the node type at the provided index. It updates currentDNA, regenerates and caches/stores the species description text, and also pre-calculates the text height for the scrollbar, resetting the scroll position.
+ */
 function selectNodeType(index) {
   currentDNA = savedNodeTypes[index].dna;
   dnaInputText = currentDNA.dnaString;
@@ -5423,6 +5629,7 @@ function selectNodeType(index) {
     for (let individualWord of words) {
       let wordLength = individualWord.length + 1;
       lineLength += wordLength;
+
       if (lineLength > charactersPerLine) {
         paragraphLines++;
         lineLength = wordLength;
@@ -5438,6 +5645,8 @@ function selectNodeType(index) {
   previewPulseRadius = 0;
 }
 
+/* Spawn the initial nodes of a ransomised DNA profile when the user first enters the simulation App state
+ */
 function createInitialNodes() {
   savedNodeTypes.push({
     dna: currentDNA,
@@ -5460,6 +5669,8 @@ function createInitialNodes() {
   // showNotification("Initial node species created", "success");
 }
 
+/* Spawns a random cluster of the current species at a random position inside the environment to make it more intuitive and easier to spawn nodes for users who may not understand they need to click within the environment to spawn node species.
+ */
 function introduceSpecies() {
   let effectiveCap = getEffectiveNodeCap();
 
@@ -5526,6 +5737,8 @@ function randomiseDNA() {
   console.log("Randomised DNA:", currentDNA);
 }
 
+/* Applies edit changes within the edit popup panel to the correlating node type, updating all active nodes of that species to reflect the new DNA and/or name.
+ */
 function confirmEditPopup() {
   if (editPopupIndex < 0 || editPopupIndex >= savedNodeTypes.length) {
     return;
@@ -5600,6 +5813,8 @@ function trimNodeType(index) {
   cleanupEmptyColonyGroups();
 }
 
+/* Removes all nodes of the specific node type which matches the provided index, then deletes that node type entry from the savedNodeTypes array. It then selects an adjacent species or randomises the DNA input if the species list becomes empty.
+ */
 function deleteNodeType(index) {
   let dnaNodeTypeToRemove = savedNodeTypes[index].dna.dnaString;
 
@@ -5620,6 +5835,7 @@ function deleteNodeType(index) {
   showNotification("Species DNA Discarded", "info");
 }
 
+// Reduce all node type counts to zero while retaining each saved node type in the species index
 function clearAllNodes() {
   nodes = [];
   colonyGroups = {};
@@ -5632,7 +5848,7 @@ function clearAllNodes() {
   }
 
   refreshNodeCounts();
-  showNotification("All Species DNA Discarded", "info");
+  showNotification("All Species Extracted - DNA is Retained", "info");
 }
 
 function readUserInput() {
@@ -5932,6 +6148,18 @@ function loadGifs() {
   }
 }
 
+function loadAmbienceSounds() {
+  let soundPaths = [
+    "sounds/computer_lab_ambience_1_compressed.mp3",
+    "sounds/space_ambience_1_compressed.mp3",
+    "sounds/space_ambience_2_compressed.mp3",
+  ];
+
+  for (let path of soundPaths) {
+    ambienceSounds.push(loadSound(path));
+  }
+}
+
 // ---
 // Utility Functions
 // ---
@@ -6010,21 +6238,22 @@ function drawCornerBraces(rx, ry, rw, rh, bracePad, braceLen, braceOpacity) {
 }
 
 function drawGlassCircleBtn(x, y, r, isHovered, label, customTooltipID = null) {
-  if (isHovered && !customTooltipID) {
-    registerTooltip(
-      "circleBtn_" + label,
-      label === "▶" ? "Resume simulation" : "Pause simulation",
-      x,
-      y + r + 35
-    );
-  }
+  // if (isHovered && !customTooltipID) {
+  //   registerTooltip(
+  //     "circleBtn_" + label,
+  //     label === "▶" ? "Resume simulation" : "Pause simulation",
+  //     label === "?" ? "Restart tutorial" : "Restart tutorial",
+  //     label === "➜]" ? "Return to Start Menu" : "Return to Start Menu",
+  //     x,
+  //     y + r + 35
+  //   );
+  // }
 
   push();
 
   // Frosted Glass circle
   drawingContext.save();
   drawingContext.beginPath();
-  // drawingContext.arc(x, y, r, 0, TWO_PI);
   drawingContext.clip();
   image(blurredTerrainGraphic, 0, 0);
 
@@ -6126,6 +6355,8 @@ function updateCursorStyle() {
   cursor(nearNode ? "grab" : ARROW);
 }
 
+/* Registers a tooltip to display close to the provided coordinates after a short hover delay. Only one tooltip is active each frame and toolTipID must be unique for each UI element in order to correctly reset the timer.
+ */
 function registerTooltip(toolTipID, text, toolTipX, toolTipY) {
   if (toolTipID !== tooltipPrevID) {
     tooltipTimer = 0;
@@ -6139,6 +6370,8 @@ function registerTooltip(toolTipID, text, toolTipX, toolTipY) {
   tooltipTimer++;
 }
 
+/* Dynamically calculates how many more nodes can be spawned based on the current population's total energy cost. High-cost and computationally expensive behaviours like weave significantly reduce the effective cap compared to lower-cost ones. It returns the effective max node count for the currently selected DNA profile.
+ */
 function getEffectiveNodeCap() {
   let totalEnergyCost = 0;
   for (let node of nodes) {
@@ -6173,13 +6406,15 @@ function getAbsoluteMaxForSpecies() {
   return min(theoreticalMax, maxNodeCap);
 }
 
+/* Removes any colony group from the colonyGroups array that have no remaining nodes. This function is called when nodes are deleted to keep the colony group register array clean.
+ */
 function cleanupEmptyColonyGroups() {
-  for (let groupID in colonyGroups) {
-    let memberCount = nodes.filter(
-      (node) => node.colonyGroupID === int(groupID)
-    ).length;
+  // Make a new array of all the group IDs that nodes are currently using
+  let activeGroupIDs = nodes.map((node) => String(node.colonyGroupID));
 
-    if (memberCount === 0) {
+  for (let groupID in colonyGroups) {
+    // If the current groupID isn't in the active array, it is empty and can be deleted
+    if (!activeGroupIDs.includes(groupID)) {
       delete colonyGroups[groupID];
     }
   }
@@ -6248,7 +6483,7 @@ function refreshNodeCounts() {
 
 //   // Title bar
 //   noStroke();
-//   fill(isDarkMode ? [220, 228, 255, 220) : [20, 22, 40, 210));
+//   fill(isDarkMode ? [220, 228, 255, 220] : [20, 22, 40, 210]);
 //   textSize(11);
 //   textStyle(BOLD);
 //   textAlign(LEFT, CENTER);
@@ -6262,19 +6497,19 @@ function refreshNodeCounts() {
 //   noStroke();
 //   fill(
 //     isDarkMode
-//       ? [150, 100, 100, closeHovered ? 150 : 100)
-//       : [160, 70, 70, closeHovered ? 160 : 120)
+//       ? [150, 100, 100, closeHovered ? 150 : 100]
+//       : [160, 70, 70, closeHovered ? 160 : 120]
 //   );
 //   circle(closeX + 5, closeY + 5, 18);
 
-//   fill(isDarkMode ? [240, 240, 255, 220) : [255, 255, 255, 240));
+//   fill(isDarkMode ? [240, 240, 255, 220] : [255, 255, 255, 240]);
 //   textSize(9);
 //   textStyle(BOLD);
 //   textAlign(CENTER, CENTER);
 //   text("✖", closeX + 5, closeY + 5);
 
 //   // Divider line below title
-//   stroke(isDarkMode ? [140, 155, 200, 60) : [180, 185, 210, 80));
+//   stroke(isDarkMode ? [140, 155, 200, 60] : [180, 185, 210, 80]);
 //   strokeWeight(1);
 //   line(px + pad, py + 30, px + pw - pad, py + 30); // 26, 28, 30
 //   noStroke();

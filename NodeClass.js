@@ -1,3 +1,18 @@
+/*
+ * Node class - Each instance becomes a single organism within the simulation.
+ *
+ * Each node is initialised from a DNA profile object and independently
+ * updates its position each frame according to its assigned behaviour.
+ * Furthermore, each node has its own visual characteristics, with this class
+ * supporting 12 distinct movement behaviours, 5 shapes, multiple trail
+ * styles, and alluring glow effects.
+ *
+ * Name: Brayden Hoyle | Student Number: n11967340
+ *
+ * Various movement behaviours were adapted from and inspired by external
+ * sources - see the top attributions comment in my sketch.js file.
+ */
+
 class Node {
   constructor(x, y, nodeTypeDNA) {
     this.x = x;
@@ -13,12 +28,12 @@ class Node {
     this.speciesName = nodeTypeDNA.speciesName || "";
     this.connectionThreshold = nodeTypeDNA.connectionThreshold;
     this.connectionStyle = nodeTypeDNA.connectionStyle;
-    // this.boundaryAlpha = 255;
+    // this.boundaryAlpha = 255; // opacity
 
     this.isPinned = false; // Being dragged around by the user
 
-    this.posHistory = [];
-    this.historyLength = int(random(20, 60)); // 80
+    this.posHistory = []; // Trail length
+    this.historyLength = int(random(20, 60)); // Randomised trail length
 
     if (nodeTypeDNA.behaviour === "lissajous") {
       this.historyLength = int(random(60, 100));
@@ -27,9 +42,10 @@ class Node {
     if (nodeTypeDNA.behaviour === "colony") {
       this.historyLength = 0;
     }
-
+    
+    // Train length and logic differs for weave nodes
     this.weaveHistory = [];
-    this.weaveMaxHistory = 600;
+    this.weaveMaxHistory = 600; // Max amount of position points that can be stored
     this.weaveJustWrapped = false;
     this.weaveMaxAge = 600;
     this.weaveDropInterval = 4;
@@ -42,7 +58,10 @@ class Node {
     let rndStartingAngle = random(TWO_PI);
     this.rotation = rndStartingAngle;
 
+    // Which colony group this node instance belongs to (or -1 if it is unassigned)
     this.colonyGroupID = -1;
+    
+    // The node instance's fixed offset from its colony anchor
     this.colonyAnchorOffset = createVector(0, 0);
     this.bobPhase = random(TWO_PI);
 
@@ -54,11 +73,9 @@ class Node {
 
     this.separationMultiplier = random(2, 5);
 
-    // this.growthVector = p5.Vector.random2D().mult(this.speed);
     this.growthVector = p5.Vector.fromAngle(this.rotation);
     this.growthVector.setMag(this.speed);
-    // this.growthSeed = random(1000);
-    this.noiseOffset = random(10000);
+    this.noiseOffset = random(10000); // Unique noise offset so each node wanders independently of the others
 
     this.growthTarget = createVector(
       random(envX + 40, envX + envW - 40),
@@ -85,7 +102,6 @@ class Node {
     this.lissajousB = nodeTypeDNA.lissajousB;
     this.lissajousPhase = nodeTypeDNA.lissajousPhase;
 
-    // this.glowRadius = int(random(2, 6));
     this.glowPhase = random(TWO_PI);
 
     this.pulseRadius = int(random(0, 35));
@@ -102,10 +118,10 @@ class Node {
     // Predate behaviour state machine
     this.predateState = "wander"; // wander, chase, feeding, stunned
     this.feedTarget = null;
-    this.eatCooldown = 0;
-    this.stunnedTimer = 0;
+    this.eatCooldown = 0; // A cooldown period timer determining how long a predate node is stunned before it can move again
+    this.stunnedTimer = 0; // A timer for how long a stunned predate node remains immobile
     this.baseColour = nodeTypeDNA.colour;
-    this.escapeRippleRadius = 0;
+    this.escapeRippleRadius = 0; // An expanding circular ring radius which is displayed when prey escapes a predate node
 
     // Dying prey state
     this.isDying = false;
@@ -114,6 +130,8 @@ class Node {
     this.dyingAlpha = 255;
   }
 
+  /* Assigns this node instance to an existing nearby colony group, or otherwise creates a new one if there are none are within the range of mergeDistance. It enforces a min separation between each of the colony anchors, as well as a max member count per group. This function returns the integer groupID that this node instance has been assigned.
+   */
   assignColonyGroup(x, y) {
     const mergeDistance = 200;
 
@@ -186,6 +204,8 @@ class Node {
     return newColonyID;
   }
 
+  /* Generates a position offset vector from the colony anchor which is based on the group's shapePattern value (between 0 to 4). Each of these patterns produces a different formation such as dense cluster, ring, ellipse, scattered, or tight ring. This function returns a p5.Vector offset which is relative to the colony anchor.
+   */
   generateColonyOffset(groupID) {
     let colonyPattern = colonyGroups[groupID]
       ? colonyGroups[groupID].shapePattern
@@ -210,6 +230,8 @@ class Node {
     }
   }
 
+  /* Updates the node instance's current position, velocity, and state each frame. It delegates to the logic specific to each behaviour via a switch case statement and then handles boundary wrapping and bounce mechanics between other nodes, as well as recotding the trail history. It skips 'update' entirely if the node is being dragged (i.e. isPinned == true).
+   */
   update(allNodes) {
     // If the user is dragging node, freeze node movement
     if (this.isPinned) {
@@ -223,49 +245,31 @@ class Node {
       if (this.dyingTimer <= 0) {
         this.isDead = true;
       }
-      
+
       if (
-      this.trailStyle !== "none" ||
-      this.behaviour === "contrail orb" ||
-      this.behaviour === "lissajous"
-    ) {
-      if (this.posHistory.length >= this.historyLength) {
-        // Move oldest point from the front
-        let recycledPoint = this.posHistory.shift();
-        // Update the point's values
-        recycledPoint.pos.set(this.x, this.y);
-        recycledPoint.wrapped = false;
-        // Move the updated point to the end
-        this.posHistory.push(recycledPoint);
-      } else {
-        // Only create new vectors until the max history length has been reached
-        this.posHistory.push({
-          pos: createVector(this.x, this.y),
-          wrapped: false,
-        });
+        this.trailStyle !== "none" ||
+        this.behaviour === "contrail orb" ||
+        this.behaviour === "lissajous"
+      ) {
+        if (this.posHistory.length >= this.historyLength) {
+          // Move oldest point from the front
+          let recycledPoint = this.posHistory.shift();
+          // Update the point's values
+          recycledPoint.pos.set(this.x, this.y);
+          recycledPoint.wrapped = false;
+          // Move the updated point to the end
+          this.posHistory.push(recycledPoint);
+        } else {
+          // Only create new vectors until the max history length has been reached
+          this.posHistory.push({
+            pos: createVector(this.x, this.y),
+            wrapped: false,
+          });
         }
       }
-      
+
       return;
     }
-      
-//       if (
-//         this.trailStyle !== "none" ||
-//         this.behaviour === "contrail orb" ||
-//         this.behaviour === "lissajous"
-//       ) {
-//         this.posHistory.push({
-//           pos: createVector(this.x, this.y),
-//           wrapped: false,
-//         });
-
-//         if (this.posHistory.length > this.historyLength) {
-//           this.posHistory.shift();
-//         }
-//       }
-
-//       return;
-//     }
 
     switch (this.behaviour) {
       case "drift wander":
@@ -394,36 +398,6 @@ class Node {
         let cohesion = createVector(0, 0);
         let separationCountFlock = 0;
         let alignmentCount = 0;
-
-        //           const separationRadius = 35;
-        //           const perceptionRadius = 110;
-        //           const maxForce = 0.08;
-
-        //           for (let other of allNodes) {
-        //             if (other === this || other.dnaString !== this.dnaString) {
-        //               continue;
-        //             }
-
-        //             let d = dist(this.x, this.y, other.x, other.y);
-
-        //             if (d > 0 && d < separationRadius) {
-        //               let away = p5.Vector.sub(
-        //                 createVector(this.x, this.y),
-        //                 createVector(other.x, other.y)
-        //               );
-        //               away.normalize().div(d);
-        //               separation.add(away);
-        //               separationCountFlock++;
-        //             }
-
-        //             if (d < perceptionRadius) {
-        //               alignment.add(other.growthVector);
-        //               // cohesion.add(createVector(other.x, other.y));
-        //               cohesion.x += other.x;
-        //               cohesion.y += other.y;
-        //               alignmentCount++;
-        //             }
-        //           }
 
         const separationRadiusSquare = 35 * 35;
         const perceptionRadiusSquare = 110 * 110;
@@ -832,24 +806,6 @@ class Node {
           envY + envH - marginY
         );
 
-        //         let growthRepulsion = createVector(0, 0);
-        //         for (let other of allNodes) {
-        //           if (other === this || other.dnaString !== this.dnaString) {
-        //             continue;
-        //           }
-
-        //           let repelDistance = dist(this.x, this.y, other.x, other.y);
-        //           if (repelDistance > 0 && repelDistance < 250) {
-        //             // 120
-        //             let repelDirection = createVector(
-        //               this.x - other.x,
-        //               this.y - other.y
-        //             );
-        //             repelDirection.normalize().div(repelDistance); // Stronger repel based on node proximity
-        //             growthRepulsion.add(repelDirection);
-        //           }
-        //         }
-
         let growthRepulsion = createVector(0, 0);
         let repelThresholdSquare = 250 * 250; // 62500
 
@@ -915,7 +871,7 @@ class Node {
         let steerWeave = p5.Vector.sub(desiredWeave, this.growthVector).limit(
           0.04
         );
-        
+
         this.growthVector.add(steerWeave);
         this.growthVector.setMag(this.speed * 0.7);
         this.x += this.growthVector.x;
@@ -1205,54 +1161,6 @@ class Node {
       }
     }
 
-    // Node-On-Node Collision Logic
-    //     for (let other of allNodes) {
-    //       if (other === this) {
-    //         continue;
-    //       }
-
-    //       let dx = this.x - other.x;
-    //       let dy = this.y - other.y;
-
-    //       // Calculate minimum allowed distance
-    //       let minDistance = (this.size + other.size) / 2;
-    //       let dSq = dx * dx + dy * dy;
-
-    //       // If nodes spawn exactly on top of each other, give them a small nudge
-    //       if (dSq === 0) {
-    //         dx = random(-0.1, 0.1);
-    //         dy = random(-0.1, 0.1);
-    //         dSq = dx * dx + dy * dy;
-    //       }
-
-    //       // See if nodes are touching
-    //       if (dSq < minDistance * minDistance) {
-    //         let d = sqrt(dSq);
-
-    //         // How much are they intersecting
-    //         let overlap = minDistance - d;
-
-    //         // Normalize the push direction
-    //         let nx = dx / d;
-    //         let ny = dy / d;
-
-    //         // Push node away by half the overlap distance positionally
-    //         this.x += nx * overlap * 0.5;
-    //         this.y += ny * overlap * 0.5;
-
-    //         let isFixedPath =
-    //           this.behaviour === "orbit" ||
-    //           this.behaviour === "lissajous" ||
-    //           this.behaviour === "colony";
-
-    //         if (!isFixedPath) {
-    //           let bounceForce = 0.35;
-    //           this.growthVector.x += nx * bounceForce;
-    //           this.growthVector.y += ny * bounceForce;
-    //         }
-    //       }
-    //     }
-
     let isFixedPathNode =
       // this.behaviour === "orbit" ||
       this.behaviour === "lissajous" ||
@@ -1293,13 +1201,15 @@ class Node {
             this.growthVector.x += nx * bounceForce;
             this.growthVector.y += ny * bounceForce;
           }
-          }
         }
       }
-
-      this.handleBoundaries();
     }
 
+    this.handleBoundaries();
+  }
+
+  /* This function ensures that each node remains inside the environment boundaries. The Orbit and lissajous behaviour nodes constrain their centre point rather than position to ensure their paths don't lie outside of the environment borders. Colony nodes are an exception however as the anchor drift logic takes care of this. The Bounce/Contrail Orb nodes are a few what reflect off the walls compared to the others which cleanly wrap around to opposite edges of the environment borders.
+   */
   handleBoundaries() {
     let nodeRadius = this.size / 2;
 
@@ -1380,6 +1290,8 @@ class Node {
     }
   }
 
+  /* This function handles the drawing logic of the node instance's glow effect using canvas shadow blur. The "steady" glow property applies a constant glow, whereas "pulse" oscillates the glow using the sin() function.
+   */
   drawGlow(c) {
     noStroke();
     let r = red(c);
@@ -1410,6 +1322,8 @@ class Node {
     }
   }
 
+  /* This function draws and the position history trail behind the node instance in the provided style. It skips trail segments marked as 'wrapped' in order to prevent straight horizontal or vertical lines from forming across the canvas. The alphaMultiplier variable fades throughout the trail during the dying animation.
+   */
   drawTrail(c, selectedTrailStyle, alphaMultiplier = 1) {
     switch (selectedTrailStyle) {
       case "curve fill":
@@ -1523,6 +1437,8 @@ class Node {
     }
   }
 
+  /* This function draws the node instance's shape at the given position/coordinates, size, and rotation angle. It translates as well as rotates the coordinate system, so that all shapes are centred on (x, y), and uses push/pop to isolate the transform from the rest of the functions.
+   */
   drawShape(x, y, s, angle) {
     push();
     translate(x, y);
@@ -1569,6 +1485,8 @@ class Node {
     endShape(CLOSE);
   }
 
+  /* This function renders and visualises the full node instance each frame, including the pulse ripple ring, prey escape ripple, weave trail segments, the position history trail, glow, and the node shape itself. It also handles the dying alpha/opacity fade.
+ */
   display() {
     push();
     let c = color(this.colour);
@@ -1578,7 +1496,13 @@ class Node {
     let cAccent = this.isDying ? this.dyingAlpha : 255;
 
     if (this.behaviour === "pulse ripple" && this.pulseRadius > 0) {
-      let pulseRingOpacity = map(this.pulseRadius, 0, this.maxPulseRadius, 220, 0);
+      let pulseRingOpacity = map(
+        this.pulseRadius,
+        0,
+        this.maxPulseRadius,
+        220,
+        0
+      );
       noFill();
       stroke(cRed, cGreen, cBlue, pulseRingOpacity);
       strokeWeight(1.8);
@@ -1591,7 +1515,12 @@ class Node {
       noFill();
       stroke(cRed, cGreen, cBlue, rippleAlpha);
       strokeWeight(2.5);
-      ellipse(this.x, this.y, this.escapeRippleRadius * 2, this.escapeRippleRadius * 2);
+      ellipse(
+        this.x,
+        this.y,
+        this.escapeRippleRadius * 2,
+        this.escapeRippleRadius * 2
+      );
       noStroke();
     }
 
@@ -1606,20 +1535,35 @@ class Node {
           continue;
         }
 
-        let ageFade = constrain(map(weavePoint.age, 0, this.weaveMaxAge, 1, 0), 0, 1);
-        let weavePulse = 0.45 + 0.55 * abs(sin(frameCount * 0.04 + this.weavePulsePhase));
+        let ageFade = constrain(
+          map(weavePoint.age, 0, this.weaveMaxAge, 1, 0),
+          0,
+          1
+        );
+        let weavePulse =
+          0.45 + 0.55 * abs(sin(frameCount * 0.04 + this.weavePulsePhase));
         let segmentOpacity = 160 * ageFade * weavePulse;
         let segmentWeight = map(weavePoint.age, 0, this.weaveMaxAge, 2.5, 0.5);
 
         // Glow - Thicker and very transparent
         stroke(cRed, cGreen, cBlue, segmentOpacity * 0.2);
         strokeWeight(segmentWeight * 3);
-        line(weavePreviousPoint.x, weavePreviousPoint.y, weavePoint.x, weavePoint.y);
+        line(
+          weavePreviousPoint.x,
+          weavePreviousPoint.y,
+          weavePoint.x,
+          weavePoint.y
+        );
 
         // Draw core line - thinner and more opaque
         stroke(cRed, cGreen, cBlue, segmentOpacity);
         strokeWeight(segmentWeight);
-        line(weavePreviousPoint.x, weavePreviousPoint.y, weavePoint.x, weavePoint.y);
+        line(
+          weavePreviousPoint.x,
+          weavePreviousPoint.y,
+          weavePoint.x,
+          weavePoint.y
+        );
       }
       noStroke();
     }
@@ -1630,11 +1574,11 @@ class Node {
     }
 
     if (activeTrail !== "none" && this.posHistory.length >= 2) {
-      this.drawTrail(c, activeTrail, cAccent / 255.0); 
+      this.drawTrail(c, activeTrail, cAccent / 255.0);
     }
 
     if (this.glowStyle !== "none") {
-      this.drawGlow(c); 
+      this.drawGlow(c);
     } else {
       fill(cRed, cGreen, cBlue, cAccent);
       noStroke();

@@ -1,6 +1,12 @@
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
+  background: #1C1D1C;
+/*   background: #2B2B2B;
+  background: #1E1E1E; */
+  color: #eee;
+  margin: 0;
 }
 canvas {
   display: block;

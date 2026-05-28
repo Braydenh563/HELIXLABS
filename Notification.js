@@ -1,11 +1,26 @@
+/*
+ * Notification & ManageNotifications classes
+ *
+ * My Notification class handles rendering a single toast styled notification
+ * alert which have a slide-in animation mostly appearing centered at the top
+ * or bottom of the canvas. It also utilises the Jarvis-inspired glassmorphism
+ * styling, with a smooth timed fade-out.
+ *
+ * ManageNotifications holds and manages the active notification queue,  with
+ * the various updates and the logic for drawing them each frame, as well as
+ * removing expired/timed-out ones automatically.
+ *
+ * Brayden Hoyle | n11967340
+ */
+
 class Notification {
   constructor(message, severity, position) {
     this.message = message;
     this.severity = severity;
     this.position = position;
 
-    this.lifespan = 220;
-    this.fadeFrames = 60;
+    this.lifespan = 180; // 220
+    this.fadeFrames = 20; // 60
     this.age = 0;
 
     this.slideProgress = 0;
@@ -39,11 +54,13 @@ class Notification {
     return this.age >= this.lifespan + this.fadeFrames;
   }
 
+  /* This function calculates the current opacity for this notification based on its age. It returns 255 (full opacity) while within the lifespan, then linearly fades to 0 over the course of the fadeFrames period.
+   */
   getnotificationOpacity() {
     if (this.age < this.lifespan) {
       return 255;
     }
-    
+
     return map(
       this.age,
       this.lifespan,
@@ -57,6 +74,7 @@ class Notification {
     if (this.position === "top") {
       return 30;
     }
+
     return height - this.notificationHeight - 24;
   }
 
@@ -64,15 +82,18 @@ class Notification {
     if (this.position === "bottom-right") {
       return width - this.notificationWidth - 24;
     }
+
     let canvasMidX = sidebarWidth + (width - sidebarWidth) / 2;
     return canvasMidX - this.notificationWidth / 2;
   }
 
   getSlideOffset() {
     let slideDistance = 24;
+
     if (this.position === "top") {
       return map(this.slideProgress, 0, 1, -slideDistance, 0);
     }
+
     return map(this.slideProgress, 0, 1, slideDistance, 0);
   }
 
@@ -83,6 +104,7 @@ class Notification {
 
   draw(stackOffset) {
     let notificationOpacity = this.getnotificationOpacity();
+
     if (notificationOpacity <= 0) {
       return;
     }
@@ -113,13 +135,14 @@ class Notification {
       this.notificationHeight,
       this.cornerRadius
     );
+
     drawingContext.shadowBlur = 0;
     drawingContext.shadowColor = "rgba(0,0,0,0)";
 
     // Glassmorphism
     drawingContext.filter = "blur(8px)";
     noStroke();
-    fill(color(0, 130, 210, 28 * opacityNorm));
+    fill(0, 130, 210, 28 * opacityNorm);
     rect(
       drawX,
       drawY,
@@ -130,7 +153,7 @@ class Notification {
     drawingContext.filter = "none";
 
     noStroke();
-    fill(color(0, 80, 160, 22 * opacityNorm));
+    fill(0, 80, 160, 22 * opacityNorm);
     rect(
       drawX,
       drawY,
@@ -152,7 +175,7 @@ class Notification {
 
     // Cyan border
     noFill();
-    stroke(color(0, 150, 255, 55 * opacityNorm));
+    stroke(0, 150, 255, 55 * opacityNorm);
     strokeWeight(1);
     rect(
       drawX,
@@ -163,7 +186,7 @@ class Notification {
     );
 
     // Top inner highlight line
-    stroke(color(100, 230, 255, 28 * opacityNorm));
+    stroke(100, 230, 255, 28 * opacityNorm);
     strokeWeight(0.5);
     line(
       drawX + this.cornerRadius,
@@ -175,26 +198,27 @@ class Notification {
     // Corner braces
     let bl = 8; // brace length
     let bp = 3; // brace pad
-    let x1 = drawX - bp; 
+    let x1 = drawX - bp;
     let y1 = drawY - bp;
     let x2 = drawX + this.notificationWidth + bp;
     let y2 = drawY + this.notificationHeight + bp;
-    stroke(color(accentR, accentG, accentB, 80 * opacityNorm));
+
+    stroke(accentR, accentG, accentB, 80 * opacityNorm);
     strokeWeight(1.5);
     noFill();
 
     // Top left
     line(x1, y1 + bl, x1, y1);
     line(x1, y1, x1 + bl, y1);
-    
+
     // Top right
     line(x2 - bl, y1, x2, y1);
     line(x2, y1, x2, y1 + bl);
-    
+
     // Bottom left
     line(x1, y2 - bl, x1, y2);
     line(x1, y2, x1 + bl, y2);
-    
+
     // Bottom right
     line(x2 - bl, y2, x2, y2);
     line(x2, y2 - bl, x2, y2);
@@ -206,7 +230,7 @@ class Notification {
     noStroke();
     fill(accentR, accentG, accentB, notificationOpacity * 0.15);
     circle(iconX, iconY, 22);
-    
+
     fill(accentR, accentG, accentB, notificationOpacity * 0.95);
     textAlign(CENTER, CENTER);
     textStyle(BOLD);
@@ -216,8 +240,8 @@ class Notification {
     // Message text
     fill(
       isDarkMode
-        ? color(210, 220, 245, notificationOpacity)
-        : color(30, 35, 55, notificationOpacity)
+        ? [210, 220, 245, notificationOpacity]
+        : [30, 35, 55, notificationOpacity]
     );
     noStroke();
     textAlign(LEFT, CENTER);
@@ -236,6 +260,8 @@ class ManageNotifications {
     this.stackSpacing = this.activeNotifications.length > 0 ? 0 : 0;
   }
 
+  /* Adds a new notification to the notification queue, then speeds up the fade-out of any older currently visible notifications so they don't excessively stack visually.
+   */
   add(message, severity = "info", position = "bottom") {
     for (let notif of this.activeNotifications) {
       if (notif.age < notif.lifespan) {
@@ -269,12 +295,13 @@ class ManageNotifications {
     }
 
     for (let position in notificationGroups) {
-      let nGroup = notificationGroups[position];
-      for (let i = 0; i < nGroup.length; i++) {
+      let notificationGroup = notificationGroups[position];
+
+      for (let i = 0; i < notificationGroup.length; i++) {
         // Make newer notifications push older ones further from the edge
         let direction = position === "top" ? -1 : 1;
         let stackOffset = i * this.stackSpacing * direction;
-        nGroup[i].draw(stackOffset);
+        notificationGroup[i].draw(stackOffset);
       }
     }
   }
