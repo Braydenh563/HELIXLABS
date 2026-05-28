@@ -43,5 +43,5 @@ See my Creative Coding GitHub repository for mroe projects!
 
 #### Libraries
 The following files in this project are open source JavaScript libraries I have used during development: 
-p5.js: https://www.jsdelivr.com/package/npm/p5 
-p5.sound.min.js: https://www.jsdelivr.com/package/npm/p5.sound
+- p5.js: https://www.jsdelivr.com/package/npm/p5 
+- p5.sound.min.js: https://www.jsdelivr.com/package/npm/p5.sound
