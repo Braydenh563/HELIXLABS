@@ -1,6 +1,7 @@
 <img width="1251" height="1251" alt="HELIXLABS_Thumbnail" src="https://github.com/user-attachments/assets/bd938af8-6bd6-4860-9c5a-a0bf143452b5" />
 
-# HELIXLABS
+# HELIXLABS - A Microbiome Simulation
+## Developer: Brayden Hoyle
 An interactive sketch simulation developed using the P5.js creative coding library by Brayden Hoyle as a passion and for the QUT unit DXB211 final assessment. Showcased at a public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia, July 2026.
 
 ``` *Instructions.txt*
@@ -37,3 +38,10 @@ https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0
 #### Related Repositories
 See my Creative Coding GitHub repository for mroe projects!
  https://github.com/Braydenh563/BH-CreativeCoding
+
+---
+
+#### Libraries
+The following files in this project are open source JavaScript libraries I have used during development
+p5.js: https://www.jsdelivr.com/package/npm/p5 
+p5.sound.min.js: https://www.jsdelivr.com/package/npm/p5.sound
