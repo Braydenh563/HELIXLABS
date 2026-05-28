@@ -1,10 +1,10 @@
 <img width="1251" height="1251" alt="HELIXLABS_Thumbnail" src="https://github.com/user-attachments/assets/bd938af8-6bd6-4860-9c5a-a0bf143452b5" />
 
 # HELIXLABS - A Microbiome Simulation
-## Developer: Brayden Hoyle
 An interactive sketch simulation developed using the P5.js creative coding library by Brayden Hoyle as a passion and for the QUT unit DXB211 final assessment. Showcased at a public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia, July 2026.
 
-``` *Instructions.txt*
+*Instructions.txt*
+```
 HELIXLABS - A Microbiome Simulation
 Your space research vessel has made an emergency landing on an uncharted planet.
 Your onboard lab has detected 26 alien base proteins. 
@@ -23,7 +23,7 @@ Controls:
 ```
 
 ### Access Links
-Note: The application & web version are only playable on a computer (PC/laptop etc)
+*Note: The application & web version are only playable on a computer (PC/laptop etc). MacOS is currently not supported.*
 
 ---
 
