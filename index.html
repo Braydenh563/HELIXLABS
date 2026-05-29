@@ -1,20 +1,214 @@
 <!DOCTYPE html>
-<html lang="en"><head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <script src="p5.js"></script>
-    <script src="p5.sound.min.js"></script>
-    
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <meta charset="utf-8">
+<html lang="en">
 
-  </head>
-  <body>
-    <main>
-    </main>
-    <script src="sketch.js"></script>
-    <script src="NodeClass.js"></script>
-    <script src="Notification.js"></script>
-    <script src="BackgroundAmbienceManager.js"></script>
-  
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <script src="p5.js"></script>
+  <script src="p5.sound.min.js"></script>
 
-</body></html>
+  <style>
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('fonts/Montserrat-VariableFont_wght.ttf');
+    }
+  </style>
+
+  <link rel="stylesheet" type="text/css" href="style.css" />
+  <meta charset="utf-8" />
+
+  <style>
+    /* Custom p5.js Loading Screen */
+    #p5_loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #1C1D1C;
+      font-family: 'Montserrat', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      overflow: hidden;
+    }
+
+    /* Corner braces */
+    .brace {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 0.2s;
+    }
+
+    .brace.tl {
+      top: 20px;
+      left: 20px;
+      border-top: 1.5px solid rgba(0, 200, 255, 0.35);
+      border-left: 1.5px solid rgba(0, 200, 255, 0.35);
+    }
+
+    .brace.tr {
+      top: 20px;
+      right: 20px;
+      border-top: 1.5px solid rgba(0, 200, 255, 0.35);
+      border-right: 1.5px solid rgba(0, 200, 255, 0.35);
+    }
+
+    .brace.bl {
+      bottom: 20px;
+      left: 20px;
+      border-bottom: 1.5px solid rgba(0, 200, 255, 0.35);
+      border-left: 1.5px solid rgba(0, 200, 255, 0.35);
+    }
+
+    .brace.br {
+      bottom: 20px;
+      right: 20px;
+      border-bottom: 1.5px solid rgba(0, 200, 255, 0.35);
+      border-right: 1.5px solid rgba(0, 200, 255, 0.35);
+    }
+
+    .logo-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease forwards 0.3s;
+    }
+
+    /* Top divider line */
+    .divider {
+      width: 160px;
+      height: 0.5px;
+      background: rgba(0, 200, 255, 0.75);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: 0.45em;
+      color: rgba(0, 200, 255, 1);
+      padding: 10px 0 8px 0;
+      text-shadow:
+        0 0 10px rgba(0, 200, 255, 0.5),
+        0 0 20px rgba(0, 200, 255, 0.25);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* Loading bar */
+    .bar-container {
+      width: 140px;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.08);
+      margin-top: 28px;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards 0.8s;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: rgba(0, 200, 255, 0.8);
+      box-shadow: 0 0 8px rgba(0, 200, 255, 0.5);
+      animation: load 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards 1s;
+    }
+
+    .status {
+      margin-top: 8px;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      color: rgba(0, 200, 255, 0.35);
+      text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 0.8s ease forwards 1s;
+    }
+
+    @keyframes pulse {
+      0% {
+        opacity: 0.55;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0.55;
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes load {
+      0% {
+        width: 0%;
+      }
+
+      60% {
+        width: 75%;
+      }
+
+      85% {
+        width: 90%;
+      }
+
+      100% {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="p5_loading">
+    <div class="brace tl"></div>
+    <div class="brace tr"></div>
+    <div class="brace bl"></div>
+    <div class="brace br"></div>
+
+    <div class="logo-wrapper">
+      <div class="divider"></div>
+      <div class="logo">HELIXLABS</div>
+      <div class="divider"></div>
+    </div>
+
+    <div class="bar-container">
+      <div class="bar"></div>
+    </div>
+    <div class="status">Initialising...</div>
+  </div>
+
+  <main></main>
+
+  <script src="sketch.js"></script>
+  <script src="NodeClass.js"></script>
+  <script src="Notification.js"></script>
+  <script src="BackgroundAmbienceManager.js"></script>
+</body>
+
+</html>
