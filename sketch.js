@@ -2897,7 +2897,7 @@ function drawSidebarSpiderChartPage(chartX, chartY, chartRadius) {
       : map(currentDNA.connectionThreshold, 0, 200, 0, 1);
 
   let values = [
-    map(currentDNA.speed, 0, 3, 0, 1),
+    currentDNA.behaviour === "colony" ? 0 : map(currentDNA.speed, 0, 3, 0, 1),
     map(currentDNA.size, 0, 35, 0, 1),
     connectionRangeValue,
     map(trailIndex, 0, trailStylesArray.length - 1, 0, 1),
@@ -2921,8 +2921,10 @@ function drawSidebarSpiderChartPage(chartX, chartY, chartRadius) {
   textAlign(CENTER, CENTER);
   text(
     "Speed: " +
-      nf(currentDNA.speed, 1, 1) +
-      " nm/s  |  Size: " +
+      (currentDNA.behaviour === "colony"
+        ? "N/A"
+        : nf(currentDNA.speed, 1, 1) + " nm/s") +
+      "  |  Size: " +
       int(currentDNA.size) +
       (currentDNA.connectionStyle === "none"
         ? "nm  |  Bond Pref: No Bonds"
