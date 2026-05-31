@@ -26,7 +26,7 @@ Controls:
 *Note: The application & web version are only playable on a computer (PC/laptop etc). MacOS is currently not supported.*
 
 ##### INTERACT WITH THE LIVE WEB VERSION HERE
-- https://editor.p5js.org/braydenh563/full/kBas-ftqq
+- https://braydenh563.github.io/HELIXLABS/
 
 ##### VIEW THE LATEST RELEASE - DISTRIBUTABLE APPLICATION v1.1.0 (Windows & Linux Compatible Download Options)
 - https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0
@@ -43,3 +43,6 @@ See my Creative Coding GitHub repository for mroe projects!
 The following files in this project are open source JavaScript libraries I have used during development: 
 - p5.js: https://www.jsdelivr.com/package/npm/p5 
 - p5.sound.min.js: https://www.jsdelivr.com/package/npm/p5.sound
+
+#### P5.js Web Editor Preview Link
+- https://editor.p5js.org/braydenh563/full/kBas-ftqq
