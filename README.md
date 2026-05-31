@@ -99,20 +99,7 @@ HELIXLABS/
 | **Primary Language** | JavaScript (99.9%) |
 | **Libraries** | p5.js, p5.sound.min.js |
 | **Deployment** | GitHub Pages (auto-deploy via GitHub Actions) |
-| **CI/CD** | ESLint, HTML Validation, Asset Size Check |
 | **License** | MIT |
-
----
-
-## CI/CD Workflows
-This project uses automated GitHub Actions workflows on every push to `main`:
-| Workflow | Purpose |
-|---|---|
-| Deploy | Auto-deploys to GitHub Pages |
-| Lint JavaScript | ESLint code quality checks |
-| Validate HTML | W3C HTML5 standards validation |
-| Asset Size Check | Flags unexpected file size bloat |
-| Auto-Label PRs | Labels pull requests by changed files |
 
 ---
 
