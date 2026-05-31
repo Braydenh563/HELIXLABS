@@ -1,0 +1,118 @@
+name: Lint JavaScript
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install ESLint
+        run: npm init -y && npm install eslint @eslint/js --save-dev
+
+      - name: Create ESLint config
+        run: |
+          cat > eslint.config.mjs << 'EOF'
+          import js from "@eslint/js";
+          export default [
+            js.configs.recommended,
+            {
+              languageOptions: {
+                ecmaVersion: 2022,
+                sourceType: "script",
+                globals: {
+                  p5: "readonly",
+                  createCanvas: "readonly",
+                  background: "readonly",
+                  fill: "readonly",
+                  stroke: "readonly",
+                  ellipse: "readonly",
+                  rect: "readonly",
+                  line: "readonly",
+                  text: "readonly",
+                  textSize: "readonly",
+                  textFont: "readonly",
+                  loadFont: "readonly",
+                  loadSound: "readonly",
+                  frameRate: "readonly",
+                  frameCount: "readonly",
+                  width: "readonly",
+                  height: "readonly",
+                  mouseX: "readonly",
+                  mouseY: "readonly",
+                  keyCode: "readonly",
+                  ENTER: "readonly",
+                  BACKSPACE: "readonly",
+                  LEFT_ARROW: "readonly",
+                  RIGHT_ARROW: "readonly",
+                  UP_ARROW: "readonly",
+                  DOWN_ARROW: "readonly",
+                  color: "readonly",
+                  push: "readonly",
+                  pop: "readonly",
+                  translate: "readonly",
+                  rotate: "readonly",
+                  scale: "readonly",
+                  noStroke: "readonly",
+                  noFill: "readonly",
+                  drawingContext: "readonly",
+                  random: "readonly",
+                  noise: "readonly",
+                  map: "readonly",
+                  dist: "readonly",
+                  lerp: "readonly",
+                  abs: "readonly",
+                  floor: "readonly",
+                  ceil: "readonly",
+                  round: "readonly",
+                  min: "readonly",
+                  max: "readonly",
+                  sqrt: "readonly",
+                  pow: "readonly",
+                  sin: "readonly",
+                  cos: "readonly",
+                  atan2: "readonly",
+                  PI: "readonly",
+                  TWO_PI: "readonly",
+                  HALF_PI: "readonly",
+                  TAU: "readonly",
+                  millis: "readonly",
+                  second: "readonly",
+                  minute: "readonly",
+                  hour: "readonly",
+                  console: "readonly",
+                  window: "readonly",
+                  document: "readonly",
+                  setTimeout: "readonly",
+                  setInterval: "readonly",
+                  clearInterval: "readonly",
+                  clearTimeout: "readonly",
+                  Image: "readonly",
+                  Notification: "readonly"
+                }
+              },
+              rules: {
+                "no-unused-vars": "warn",
+                "no-undef": "warn",
+                "no-console": "off",
+                "semi": ["warn", "always"],
+                "eqeqeq": ["warn", "always"]
+              }
+            }
+          ];
+          EOF
+
+      - name: Run ESLint
+        run: npx eslint sketch.js NodeClass.js BackgroundAmbienceManager.js Notification.js
+        continue-on-error: true

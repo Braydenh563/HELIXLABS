@@ -1,0 +1,44 @@
+simulation-core:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'sketch.js'
+
+node-system:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'NodeClass.js'
+
+audio:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'BackgroundAmbienceManager.js'
+      - 'sounds/**'
+
+notifications:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Notification.js'
+
+ui:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'style.css'
+      - 'index.html'
+
+assets:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'gifs/**'
+      - 'fonts/**'
+      - 'metadata/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '*.md'
+      - 'README.md'
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '.github/**'

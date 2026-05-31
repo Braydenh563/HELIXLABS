@@ -1,0 +1,49 @@
+name: Asset Size Check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for unexpectedly large files
+        run: |
+          echo "=== Checking for large JavaScript files (>6MB) ==="
+          LARGE_JS=$(find . -name "*.js" -not -path "./.git/*" -not -name "p5.js" -size +6M)
+          if [ -n "$LARGE_JS" ]; then
+            echo "⚠️  WARNING: Unexpected large JS files found:"
+            echo "$LARGE_JS"
+          else
+            echo "✅ No unexpectedly large JS files found."
+          fi
+
+          echo ""
+          echo "=== Checking for large audio files (>3MB) ==="
+          LARGE_AUDIO=$(find . \( -name "*.mp3" -o -name "*.wav" -o -name "*.ogg" \) -not -path "./.git/*" -size +3M)
+          if [ -n "$LARGE_AUDIO" ]; then
+            echo "⚠️  WARNING: Large audio files found (consider compressing):"
+            echo "$LARGE_AUDIO"
+          else
+            echo "✅ Audio files are within acceptable size."
+          fi
+
+          echo ""
+          echo "=== Checking for large image/gif files (>5MB) ==="
+          LARGE_IMG=$(find . \( -name "*.gif" -o -name "*.png" -o -name "*.jpg" \) -not -path "./.git/*" -size +5M)
+          if [ -n "$LARGE_IMG" ]; then
+            echo "⚠️  WARNING: Large image/gif files found (consider optimising):"
+            echo "$LARGE_IMG"
+          else
+            echo "✅ Image and GIF files are within acceptable size."
+          fi
+
+          echo ""
+          echo "=== Overall repo asset summary ==="
+          du -sh fonts/ gifs/ sounds/ metadata/ 2>/dev/null || echo "(some asset folders not found)"
