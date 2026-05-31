@@ -1,48 +1,136 @@
-<img width="1251" height="1251" alt="HELIXLABS_Thumbnail" src="https://github.com/user-attachments/assets/bd938af8-6bd6-4860-9c5a-a0bf143452b5" />
+<div align="center">
 
-# HELIXLABS - A Microbiome Simulation
-An interactive sketch simulation developed using the P5.js creative coding library by Brayden Hoyle as a passion and for the QUT unit DXB211 final assessment. Showcased at a public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia, July 2026.
+<img width="200" alt="HELIXLABS Thumbnail" src="metadata/HELIXLABS_Thumbnail.png" />
 
-*Instructions.txt*
-```
-HELIXLABS - A Microbiome Simulation
-Your space research vessel has made an emergency landing on an uncharted planet.
-Your onboard lab has detected 26 alien base proteins. 
+# HELIXLABS — A Microbiome Simulation
 
-Your mission: synthesise new life forms and observe what emerges.
+**An interactive microbiome simulation built with p5.js. Synthesise alien life forms, introduce them into a living ecosystem, and watch emergent behaviour unfold in real time.**
 
-Type any combination of letters (A-Z) into the DNA helix bar at the bottom of the screen to create a unique species.
-Click inside the bordered environment to release your organisms and watch them come alive - each sequence produces a different creature with its own attributes such as colour, shape, movement, behaviour, and more.
+[![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge)](https://braydenh563.github.io/HELIXLABS/)
+[![Latest Release](https://img.shields.io/github/v/release/Braydenh563/HELIXLABS?style=for-the-badge&color=blue)](https://github.com/Braydenh563/HELIXLABS/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+[![Deploy](https://github.com/Braydenh563/HELIXLABS/actions/workflows/deploy.yml/badge.svg)](https://github.com/Braydenh563/HELIXLABS/actions/workflows/deploy.yml)
+[![Lint](https://github.com/Braydenh563/HELIXLABS/actions/workflows/lint.yml/badge.svg)](https://github.com/Braydenh563/HELIXLABS/actions/workflows/lint.yml)
 
-Controls:
-- Type letters - define & craft your DNA helix/sequence
-- Click environment - spawn and introduce your new species
-- Click & drag - move individual organisms
-- Randomise button - generate a surprise sequence
-- Trackpad - navigate and interact
-```
-
-### Access Links
-*Note: The application & web version are only playable on a computer (PC/laptop etc). MacOS is currently not supported.*
-
-##### INTERACT WITH THE LIVE WEB VERSION HERE
-- https://braydenh563.github.io/HELIXLABS/
-
-##### VIEW THE LATEST RELEASE - DISTRIBUTABLE APPLICATION v1.1.0 (Windows & Linux Compatible Download Options)
-- https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0
+</div>
 
 ---
 
-#### Related Repositories
-See my Creative Coding GitHub repository for mroe projects!
- https://github.com/Braydenh563/BH-CreativeCoding
+## Overview
+
+HELIXLABS is a creative coding project developed in JavaScript using the **p5.js** library. Players craft unique microorganisms by sequencing alien base proteins, then release them into a simulated petri-dish environment. Each species exhibits distinct behaviours — competing, coexisting, and evolving within the simulation.
+
+Originally developed for the **QUT DXB211** (Interaction Design) final assessment, the project was showcased at a **public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia (July 2026)**.
 
 ---
 
-#### Libraries
-The following files in this project are open source JavaScript libraries I have used during development: 
-- p5.js: https://www.jsdelivr.com/package/npm/p5 
-- p5.sound.min.js: https://www.jsdelivr.com/package/npm/p5.sound
+## Showcase
 
-#### P5.js Web Editor Preview Link
-- https://editor.p5js.org/braydenh563/full/kBas-ftqq
+### Core Gameplay — Randomise & Introduce Controls
+![Randomise and Introduce Controls](gifs/HELIXLABS_RandomiseIntroduceControls-Compressed.gif)
+
+### Species Index
+![Species Index](gifs/HELIXLABS_SpeciesIndex-Compressed.gif)
+
+### Tutorial Walkthrough
+![Tutorial Step 1](gifs/HELIXLABS_Tutorial_1-Compressed.gif)
+![Tutorial Step 2](gifs/HELIXLABS_Tutorial_2-Compressed.gif)
+![Tutorial Step 3](gifs/HELIXLABS_Tutorial_3-Compressed.gif)
+
+---
+
+## Features
+
+- **Procedural Species Generation** — 26 alien base proteins combine to produce unique organisms with distinct traits and behaviours
+- **Real-Time Ecosystem Simulation** — organisms interact, compete, and coexist dynamically within the environment
+- **Emergent Behaviour System** — species behaviour arises organically from their DNA sequence, not hardcoded rules
+- **Ambient Audio Engine** — a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state
+- **Species Index UI** — an in-simulation encyclopedia cataloguing every species you have introduced
+- **Tutorial System** — a built-in guided walkthrough for first-time players
+- **FPS Performance Indicator** — real-time performance monitoring overlay
+- **Randomise Mode** — instantly generate a surprise DNA sequence for quick experimentation
+- **Click & Drag Interaction** — physically move individual organisms around the environment
+- **Notification System** — custom in-simulation notifications via `Notification.js`
+
+---
+
+## Controls
+
+| Input | Action |
+|---|---|
+| **Type letters (A–Z)** | Define and craft your DNA helix/sequence |
+| **Click environment** | Spawn and introduce your new species |
+| **Click & drag** | Move individual organisms |
+| **Randomise button** | Generate a surprise sequence |
+| **Trackpad / scroll** | Navigate and interact with the environment |
+
+---
+
+## Access & Compatibility
+
+> **Note:** HELIXLABS is currently playable on **PC/Laptop (Windows & Linux)** only. MacOS is not currently supported.
+
+| Platform | Link |
+|---|---|
+| Live Web Version | [braydenh563.github.io/HELIXLABS](https://braydenh563.github.io/HELIXLABS/) |
+| Latest Release (v1.1.0) | [Download for Windows & Linux](https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0) |
+| p5.js Web Editor Preview | [Open in Editor](https://editor.p5js.org/braydenh563/full/kBas-ftqq) |
+
+---
+
+## Project Structure
+
+```
+HELIXLABS/
+├── index.html                        # Entry point
+├── style.css                         # Styling
+├── sketch.js                         # Core simulation loop & logic
+├── NodeClass.js                      # Species/organism node system
+├── BackgroundAmbienceManager.js      # Dynamic ambient audio engine
+├── Notification.js                   # In-simulation notification system
+├── gifs/                             # Showcase GIFs
+├── sounds/                           # Audio assets
+├── fonts/                            # Custom fonts
+├── metadata/                         # Thumbnail & metadata assets
+└└── .github/workflows/               # CI/CD GitHub Actions
+```
+
+---
+
+## Technical Details
+
+| Detail | Info |
+|---|---|
+| **Primary Language** | JavaScript (99.9%) |
+| **Libraries** | p5.js, p5.sound.min.js |
+| **Deployment** | GitHub Pages (auto-deploy via GitHub Actions) |
+| **CI/CD** | ESLint, HTML Validation, Asset Size Check |
+| **License** | MIT |
+
+---
+
+## CI/CD Workflows
+
+This project uses automated GitHub Actions workflows on every push to `main`:
+
+| Workflow | Purpose |
+|---|---|
+| Deploy | Auto-deploys to GitHub Pages |
+| Lint JavaScript | ESLint code quality checks |
+| Validate HTML | W3C HTML5 standards validation |
+| Asset Size Check | Flags unexpected file size bloat |
+| Auto-Label PRs | Labels pull requests by changed files |
+
+---
+
+## About the Developer
+
+Created by **Brayden Hoyle**, a Computer Science & Interaction Design student at **Queensland University of Technology (QUT)**, Brisbane, Australia.
+
+- GitHub: [@Braydenh563](https://github.com/Braydenh563)
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
