@@ -54,7 +54,7 @@ Originally developed for the **QUT DXB211** (Interaction Design) final assessmen
 - **Procedural Species Generation** - 26 alien base proteins combine to produce unique organisms with distinct traits and behaviours
 - **Real-Time Ecosystem Simulation** - organisms interact, compete, and coexist dynamically within the environment
 - **Emergent Behaviour System** - species behaviour arises organically from their DNA sequence, not hardcoded rules
-- **Ambient Audio Engine** - a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state
+- **Ambient Audio Engine** - a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state (uses royalty free music)
 - **Species Index UI** - an in-simulation encyclopedia cataloguing every species you have introduced
 - **Tutorial System** - a built-in guided walkthrough for first-time players
 - **FPS Performance Indicator** - real-time performance monitoring overlay
