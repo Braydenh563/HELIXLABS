@@ -51,7 +51,7 @@ Originally developed for the QUT **DXB211** (Creative Coding) final assessment, 
 ---
 
 ## Features
-- **Procedural Species Generation** - 26 alien base proteins combine to produce unique organisms with distinct traits and behaviours
+- **Procedural Species Generation** - 26 alien base proteins combine to produce unique organisms with distinct traits and behaviours using instances of `NodeClass.js`
 - **Real-Time Ecosystem Simulation** - organisms interact, compete, and coexist dynamically within the environment
 - **Emergent Behaviour System** - species behaviour arises organically from their DNA sequence, not hardcoded rules
 - **Ambient Audio Engine** - a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state (uses royalty free music)
@@ -61,6 +61,15 @@ Originally developed for the QUT **DXB211** (Creative Coding) final assessment, 
 - **Randomise Mode** - instantly generate a surprise DNA sequence for quick experimentation
 - **Click & Drag Interaction** - physically move individual organisms around the environment
 - **Notification System** - custom in-simulation notifications via `Notification.js`
+
+### Creative Influences
+ - Make Your Own Pen Shapes v1.7 - (dllyd, 2018)
+   - Link: https://www.red3d.com/cwr/boids/ 
+ - Glassmorphism - Michal Malewicz (Malewicz, 2026) & the Jarvis HUD – Jayse Hansen (2008)
+   - Link: https://scratch.mit.edu/projects/89132897 
+ - Boids - Craig Reynolds (Reynolds, 2001)
+   - Link: https://uxdesign.cc/glassmorphism-in-user-interfaces-1f39bb1308c9 
+
 
 ---
 
