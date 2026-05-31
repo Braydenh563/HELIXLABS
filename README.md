@@ -20,7 +20,7 @@
 ## Overview
 HELIXLABS is a creative coding project developed in JavaScript using the **p5.js** library. Users craft unique microorganisms by sequencing alien base proteins, then release them into a simulated petri-dish environment. Each species exhibits distinct behaviours - competing, coexisting, and evolving within the simulation.
 
-Originally developed for the QUT **DXB211** (Creative Coding) final assessment, the project will be showcased at the Queensland Games Festival (June, 2026), as well as a **public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia (July 2026)**.
+Originally developed for the QUT **DXB211** (Creative Coding) final assessment, the project will be showcased at the **Queensland Games Festival (June, 2026)**, as well as a **public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia (July 2026)**.
 
 ---
 
