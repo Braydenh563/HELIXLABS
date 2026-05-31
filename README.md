@@ -4,7 +4,7 @@
 
 # HELIXLABS - A Microbiome Simulation
 
-**An interactive microbiome simulation built with p5.js. Synthesise alien life forms, introduce them into a living ecosystem, and watch emergent behaviour unfold in real time.**
+**An interactive microbiome simulation built with p5.js. Synthesise alien life forms, introduce them into a living ecosystem, and observe each species' behaviour unfold in real time.**
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge)](https://braydenh563.github.io/HELIXLABS/)
 [![Latest Release](https://img.shields.io/github/v/release/Braydenh563/HELIXLABS?style=for-the-badge&color=blue)](https://github.com/Braydenh563/HELIXLABS/releases)
@@ -18,9 +18,9 @@
 ---
 
 ## Overview
-HELIXLABS is a creative coding project developed in JavaScript using the **p5.js** library. Players craft unique microorganisms by sequencing alien base proteins, then release them into a simulated petri-dish environment. Each species exhibits distinct behaviours - competing, coexisting, and evolving within the simulation.
+HELIXLABS is a creative coding project developed in JavaScript using the **p5.js** library. Users craft unique microorganisms by sequencing alien base proteins, then release them into a simulated petri-dish environment. Each species exhibits distinct behaviours - competing, coexisting, and evolving within the simulation.
 
-Originally developed for the **QUT DXB211** (Interaction Design) final assessment, the project was showcased at a **public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia (July 2026)**.
+Originally developed for the QUT **DXB211** (Creative Coding) final assessment, the project will be showcased at the Queensland Games Festival (June, 2026), as well as a **public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia (July 2026)**.
 
 ---
 
