@@ -56,7 +56,7 @@ Originally developed for the QUT **DXB211** (Creative Coding) final assessment, 
 - **Species Behaviour System** - species behaviour is procedurally determined from their DNA sequence
 - **Ambient Audio Engine** - a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state (uses royalty free music)
 - **Species Index UI** - an in-simulation encyclopedia cataloguing every species you have introduced
-- **Tutorial & Conceptual Hint Uability Popups** - a built-in guided walkthrough for first-time players
+- **Tutorial & Conceptual Hint Popups** - a built-in guided walkthrough for first-time players
 - **FPS Performance Indicator** - real-time performance monitoring overlay
 - **Randomise Function** - instantly generate a randomly generated DNA sequence for quick experimentation
 - **Click & Drag Interaction** - physically move individual organisms around the environment
