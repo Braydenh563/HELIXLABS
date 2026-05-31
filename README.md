@@ -64,12 +64,11 @@ Originally developed for the QUT **DXB211** (Creative Coding) final assessment, 
 
 ### Creative Influences
  - Make Your Own Pen Shapes v1.7 - (dllyd, 2018)
-   - Link: https://www.red3d.com/cwr/boids/ 
- - Glassmorphism - Michal Malewicz (Malewicz, 2026) & the Jarvis HUD – Jayse Hansen (2008)
    - Link: https://scratch.mit.edu/projects/89132897 
- - Boids - Craig Reynolds (Reynolds, 2001)
+ - Glassmorphism - Michal Malewicz (Malewicz, 2026) & the Jarvis HUD – Jayse Hansen (2008)
    - Link: https://uxdesign.cc/glassmorphism-in-user-interfaces-1f39bb1308c9 
-
+ - Boids - Craig Reynolds (Reynolds, 2001)
+   - Link: https://www.red3d.com/cwr/boids/ 
 
 ---
 
