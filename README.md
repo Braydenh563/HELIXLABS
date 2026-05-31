@@ -2,7 +2,7 @@
 
 <img width="200" alt="HELIXLABS Thumbnail" src="metadata/HELIXLABS_Thumbnail.png" />
 
-# HELIXLABS — A Microbiome Simulation
+# HELIXLABS - A Microbiome Simulation
 
 **An interactive microbiome simulation built with p5.js. Synthesise alien life forms, introduce them into a living ecosystem, and watch emergent behaviour unfold in real time.**
 
@@ -17,8 +17,7 @@
 ---
 
 ## Overview
-
-HELIXLABS is a creative coding project developed in JavaScript using the **p5.js** library. Players craft unique microorganisms by sequencing alien base proteins, then release them into a simulated petri-dish environment. Each species exhibits distinct behaviours — competing, coexisting, and evolving within the simulation.
+HELIXLABS is a creative coding project developed in JavaScript using the **p5.js** library. Players craft unique microorganisms by sequencing alien base proteins, then release them into a simulated petri-dish environment. Each species exhibits distinct behaviours - competing, coexisting, and evolving within the simulation.
 
 Originally developed for the **QUT DXB211** (Interaction Design) final assessment, the project was showcased at a **public exhibition at The Lanes, Fortitude Valley, Brisbane, Australia (July 2026)**.
 
@@ -26,7 +25,7 @@ Originally developed for the **QUT DXB211** (Interaction Design) final assessmen
 
 ## Showcase
 
-### Core Gameplay — Randomise & Introduce Controls
+### Core Gameplay - Randomise & Introduce Controls
 ![Randomise and Introduce Controls](gifs/HELIXLABS_RandomiseIntroduceControls-Compressed.gif)
 
 ### Species Index
@@ -40,22 +39,20 @@ Originally developed for the **QUT DXB211** (Interaction Design) final assessmen
 ---
 
 ## Features
-
-- **Procedural Species Generation** — 26 alien base proteins combine to produce unique organisms with distinct traits and behaviours
-- **Real-Time Ecosystem Simulation** — organisms interact, compete, and coexist dynamically within the environment
-- **Emergent Behaviour System** — species behaviour arises organically from their DNA sequence, not hardcoded rules
-- **Ambient Audio Engine** — a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state
-- **Species Index UI** — an in-simulation encyclopedia cataloguing every species you have introduced
-- **Tutorial System** — a built-in guided walkthrough for first-time players
-- **FPS Performance Indicator** — real-time performance monitoring overlay
-- **Randomise Mode** — instantly generate a surprise DNA sequence for quick experimentation
-- **Click & Drag Interaction** — physically move individual organisms around the environment
-- **Notification System** — custom in-simulation notifications via `Notification.js`
+- **Procedural Species Generation** - 26 alien base proteins combine to produce unique organisms with distinct traits and behaviours
+- **Real-Time Ecosystem Simulation** - organisms interact, compete, and coexist dynamically within the environment
+- **Emergent Behaviour System** - species behaviour arises organically from their DNA sequence, not hardcoded rules
+- **Ambient Audio Engine** - a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state
+- **Species Index UI** - an in-simulation encyclopedia cataloguing every species you have introduced
+- **Tutorial System** - a built-in guided walkthrough for first-time players
+- **FPS Performance Indicator** - real-time performance monitoring overlay
+- **Randomise Mode** - instantly generate a surprise DNA sequence for quick experimentation
+- **Click & Drag Interaction** - physically move individual organisms around the environment
+- **Notification System** - custom in-simulation notifications via `Notification.js`
 
 ---
 
 ## Controls
-
 | Input | Action |
 |---|---|
 | **Type letters (A–Z)** | Define and craft your DNA helix/sequence |
@@ -67,7 +64,6 @@ Originally developed for the **QUT DXB211** (Interaction Design) final assessmen
 ---
 
 ## Access & Compatibility
-
 > **Note:** HELIXLABS is currently playable on **PC/Laptop (Windows & Linux)** only. MacOS is not currently supported.
 
 | Platform | Link |
@@ -79,7 +75,6 @@ Originally developed for the **QUT DXB211** (Interaction Design) final assessmen
 ---
 
 ## Project Structure
-
 ```
 HELIXLABS/
 ├── index.html                        # Entry point
@@ -98,7 +93,6 @@ HELIXLABS/
 ---
 
 ## Technical Details
-
 | Detail | Info |
 |---|---|
 | **Primary Language** | JavaScript (99.9%) |
@@ -110,9 +104,7 @@ HELIXLABS/
 ---
 
 ## CI/CD Workflows
-
 This project uses automated GitHub Actions workflows on every push to `main`:
-
 | Workflow | Purpose |
 |---|---|
 | Deploy | Auto-deploys to GitHub Pages |
@@ -124,7 +116,6 @@ This project uses automated GitHub Actions workflows on every push to `main`:
 ---
 
 ## About the Developer
-
 Created by **Brayden Hoyle**, a Computer Science & Interaction Design student at **Queensland University of Technology (QUT)**, Brisbane, Australia.
 
 - GitHub: [@Braydenh563](https://github.com/Braydenh563)
@@ -132,5 +123,4 @@ Created by **Brayden Hoyle**, a Computer Science & Interaction Design student at
 ---
 
 ## License
-
 This project is licensed under the [MIT License](LICENSE).
