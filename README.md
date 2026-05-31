@@ -24,6 +24,17 @@ Originally developed for the **QUT DXB211** (Interaction Design) final assessmen
 
 ---
 
+## Access & Compatibility
+> **Note:** HELIXLABS is currently playable on **PC/Laptop (Windows & Linux)** only. MacOS is not currently supported.
+
+| Platform | Link |
+|---|---|
+| Live Web Version | [braydenh563.github.io/HELIXLABS](https://braydenh563.github.io/HELIXLABS/) |
+| Latest Release (v1.1.0) | [Download for Windows & Linux](https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0) |
+| p5.js Web Editor Preview | [Open in Editor](https://editor.p5js.org/braydenh563/full/kBas-ftqq) |
+
+---
+
 ## Showcase
 
 ### Core Gameplay - Randomise & Introduce Controls
@@ -61,17 +72,6 @@ Originally developed for the **QUT DXB211** (Interaction Design) final assessmen
 | **Click & drag** | Move individual organisms |
 | **Randomise button** | Generate a surprise sequence |
 | **Trackpad / scroll** | Navigate and interact with the environment |
-
----
-
-## Access & Compatibility
-> **Note:** HELIXLABS is currently playable on **PC/Laptop (Windows & Linux)** only. MacOS is not currently supported.
-
-| Platform | Link |
-|---|---|
-| Live Web Version | [braydenh563.github.io/HELIXLABS](https://braydenh563.github.io/HELIXLABS/) |
-| Latest Release (v1.1.0) | [Download for Windows & Linux](https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0) |
-| p5.js Web Editor Preview | [Open in Editor](https://editor.p5js.org/braydenh563/full/kBas-ftqq) |
 
 ---
 
