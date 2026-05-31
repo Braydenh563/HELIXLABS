@@ -9,6 +9,7 @@
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge)](https://braydenh563.github.io/HELIXLABS/)
 [![Latest Release](https://img.shields.io/github/v/release/Braydenh563/HELIXLABS?style=for-the-badge&color=blue)](https://github.com/Braydenh563/HELIXLABS/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+
 [![Deploy](https://github.com/Braydenh563/HELIXLABS/actions/workflows/deploy.yml/badge.svg)](https://github.com/Braydenh563/HELIXLABS/actions/workflows/deploy.yml)
 [![Lint](https://github.com/Braydenh563/HELIXLABS/actions/workflows/lint.yml/badge.svg)](https://github.com/Braydenh563/HELIXLABS/actions/workflows/lint.yml)
 
