@@ -52,13 +52,13 @@ Originally developed for the QUT **DXB211** (Creative Coding) final assessment, 
 
 ## Features
 - **Procedural Species Generation** - 26 alien base proteins combine to produce unique organisms with distinct traits and behaviours using instances of `NodeClass.js`
-- **Real-Time Ecosystem Simulation** - organisms interact, compete, and coexist dynamically within the environment
-- **Emergent Behaviour System** - species behaviour arises organically from their DNA sequence, not hardcoded rules
+- **Ecosystem Simulation** - organisms interact, compete, and coexist dynamically within the environment
+- **Species Behaviour System** - species behaviour is procedurally determined from their DNA sequence
 - **Ambient Audio Engine** - a custom `BackgroundAmbienceManager` dynamically layers sound based on simulation state (uses royalty free music)
 - **Species Index UI** - an in-simulation encyclopedia cataloguing every species you have introduced
-- **Tutorial System** - a built-in guided walkthrough for first-time players
+- **Tutorial & Conceptual Hint Uability Popups** - a built-in guided walkthrough for first-time players
 - **FPS Performance Indicator** - real-time performance monitoring overlay
-- **Randomise Mode** - instantly generate a surprise DNA sequence for quick experimentation
+- **Randomise Function** - instantly generate a randomly generated DNA sequence for quick experimentation
 - **Click & Drag Interaction** - physically move individual organisms around the environment
 - **Notification System** - custom in-simulation notifications via `Notification.js`
 
@@ -76,7 +76,7 @@ Originally developed for the QUT **DXB211** (Creative Coding) final assessment, 
 | Input | Action |
 |---|---|
 | **Type letters (A–Z)** | Define and craft your DNA helix/sequence |
-| **Click environment** | Spawn and introduce your new species |
+| **Click the environment** | Spawn and introduce your new species |
 | **Click & drag** | Move individual organisms |
 | **Randomise button** | Generate a surprise sequence |
 | **Trackpad / scroll** | Navigate and interact with the environment |
