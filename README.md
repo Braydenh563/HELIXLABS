@@ -7,7 +7,6 @@
 **An interactive microbiome simulation built with p5.js. Synthesise alien life forms, introduce them into a living ecosystem, and observe each species' behaviour unfold in real time.**
 
 [![Live Demo](https://img.shields.io/badge/demo-live-brightgreen?style=for-the-badge)](https://braydenh563.github.io/HELIXLABS/)
-[![Latest Release](https://img.shields.io/github/v/release/Braydenh563/HELIXLABS?style=for-the-badge&color=blue)](https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
 
 [![Deploy](https://github.com/Braydenh563/HELIXLABS/actions/workflows/deploy.yml/badge.svg)](https://github.com/Braydenh563/HELIXLABS/actions/workflows/deploy.yml)
