@@ -30,7 +30,6 @@ Originally developed for the QUT **DXB211** (Creative Coding) final assessment, 
 |---|---|
 | Live Web Version | [braydenh563.github.io/HELIXLABS](https://braydenh563.github.io/HELIXLABS/) |
 | Latest Release (v1.1.0) | [Download for Windows & Linux](https://github.com/Braydenh563/HELIXLABS/releases/tag/v1.1.0) |
-| p5.js Web Editor Preview | [Open in Editor](https://editor.p5js.org/braydenh563/full/kBas-ftqq) |
 
 ---
 
